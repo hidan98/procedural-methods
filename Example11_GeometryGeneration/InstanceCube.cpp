@@ -12,19 +12,20 @@ InstanceCube::~InstanceCube()
 {
 	BaseMesh::~BaseMesh();
 }
-
-void InstanceCube::initBuffers(ID3D11Device* device)
+void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count)
 {
+
+
 	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
 
 
 	vertexCount = 36;
 	indexCount = 36;
-	instanceCount = 1000000;
+	instanceCount = count;
 	VertexType* vertices = new VertexType[vertexCount];
 	InstanceType* instances = new InstanceType[instanceCount];
 	unsigned long* indices = new unsigned long[indexCount];
-	
+
 
 	//front face
 	vertices[0].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -57,7 +58,7 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 	vertices[5].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[5] = 5;
 
-	
+
 
 	//top face
 	vertices[6].position = XMFLOAT3(0.0f, 1.0f, 1.0f);
@@ -90,7 +91,7 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 	vertices[11].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[11] = 11;
 
-	
+
 
 	//back face
 
@@ -220,25 +221,22 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 	vertices[35].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[35] = 30;
 
-	int count = 0;
-	int step = 0;
-	int offsetY = 0;
-	int offsetZ = 0;
+
+	int index;
+	int pos = 0;
 	for (int i = 0; i < 100; i++)
 	{
-		offsetY = 0;
+
 		for (int j = 0; j < 100; j++)
 		{
-			int offsetX = 0;
-			for (int k = 0; k < 100; k++)
+			index = (100 * i) + j;
+			if (cellMap[index] == true)
 			{
-				instances[count].position = XMFLOAT3(offsetX, offsetY, offsetZ);
-				count++;
-				offsetX += 2;
+				instances[pos].position = XMFLOAT3(j, 0.f, i);
+				pos++;
 			}
-			offsetY += 2;
 		}
-		offsetZ += 2;
+
 	}
 	/*instances[0].position = XMFLOAT3(10.0f, 0.0f, 5.0f);
 	instances[1].position = XMFLOAT3(1.0f, 0.0f, 5.0f);
@@ -264,6 +262,10 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 
 	delete[] instances;
 	instances = 0;
+}
+void InstanceCube::initBuffers(ID3D11Device* device)
+{
+	
 
 }
 

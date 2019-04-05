@@ -7,6 +7,7 @@
 #include "GeometryShader.h"
 #include "InstanceCube.h"
 #include "InstanceShader.h"
+#include"Cave.h"
 
 class App1 : public BaseApplication
 {
@@ -28,6 +29,14 @@ private:
 
 	InstanceCube* cube;
 	InstanceShader* shader;
+	Cave* caveGen;
+
+	bool regen;
+	bool step;
+
+	int chance;
+	int death;
+	int alive;
 };
 
 #endif

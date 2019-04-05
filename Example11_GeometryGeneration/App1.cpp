@@ -11,13 +11,14 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 {
 	// Call super/parent init function (required!)
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
+
+	caveGen = new Cave();
+	caveGen->initializeMap(100, 100, chance);
 	cube = new InstanceCube(renderer->getDevice());
+	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
-	// Create Mesh object and shader object
-	mesh = new PointMesh(renderer->getDevice(), renderer->getDeviceContext());
-	textureMgr->loadTexture("brick", L"res/brick1.dds");
-	geometryShader = new GeometryShader(renderer->getDevice(), hwnd);
+	
 }
 
 
@@ -34,6 +35,20 @@ App1::~App1()
 bool App1::frame()
 {
 	bool result;
+
+	if (regen)
+	{
+		caveGen->initializeMap(100, 100, chance);
+		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
+		regen = false;
+	}
+
+	if (step)
+	{
+		caveGen->step(death, alive);
+		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
+		step = false;
+	}
 
 	result = BaseApplication::frame();
 	if (!result)
@@ -88,6 +103,23 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
+	if (ImGui::Button("Test"))
+	{
+		regen = true;
+	}
+	else
+		regen = false;
+
+	if (ImGui::Button("Step"))
+	{
+		step = true;
+	}
+	else
+		step = false;
+	
+	ImGui::InputInt("Chance", &chance);
+	ImGui::InputInt("death limit", &death);
+	ImGui::InputInt("ALive limit", &alive);
 
 	// Render UI
 	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
