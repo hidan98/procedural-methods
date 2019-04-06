@@ -37,11 +37,12 @@ void Cave::initializeMap(int width, int depth, int height, int chance)
 	count = 0;
 	
 	int index;
-	for (int x = 0; x < depth_; x++)
+
+	for (int z = 0; z < depth_; z++)
 	{		
-		for (int z = 0; z < width_; z++)
+		for (int x = 0; x < width_; x++)
 		{
-			index = (depth_ * x) + z;
+			index = (width_ * z) + x;
 			randNum = rand() % 100;
 			if (randNum < chance)
 			{

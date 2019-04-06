@@ -224,14 +224,14 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	int index;
 	int pos = 0;
-	for (int i = 0; i < width; i++)
+	for (int z = 0; z < depth; z++)
 	{
-		for (int j = 0; j < depth; j++)
+		for (int x = 0; x < width; x++)
 		{
-			index = (width * i) + j;
+			index = (width * z) + x;
 			if (cellMap[index])
 			{
-				instances[pos].position = XMFLOAT3(j, 0.f, i);
+				instances[pos].position = XMFLOAT3(x, 0.f, z);
 				instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
 				pos++;
 			}
