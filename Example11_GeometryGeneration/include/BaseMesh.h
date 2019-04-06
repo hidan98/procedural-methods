@@ -46,6 +46,7 @@ protected:
 	struct InstanceType
 	{
 		XMFLOAT3 position;
+		XMFLOAT4 colour;
 	};
 
 public:

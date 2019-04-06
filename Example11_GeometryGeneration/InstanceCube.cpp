@@ -12,7 +12,7 @@ InstanceCube::~InstanceCube()
 {
 	BaseMesh::~BaseMesh();
 }
-void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count)
+void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int width, int depth, int height)
 {
 
 
@@ -224,23 +224,21 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count)
 
 	int index;
 	int pos = 0;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < width; i++)
 	{
-
-		for (int j = 0; j < 100; j++)
+		for (int j = 0; j < depth; j++)
 		{
-			index = (100 * i) + j;
-			if (cellMap[index] == true)
+			index = (width * i) + j;
+			if (cellMap[index])
 			{
 				instances[pos].position = XMFLOAT3(j, 0.f, i);
+				instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
 				pos++;
 			}
 		}
 
 	}
-	/*instances[0].position = XMFLOAT3(10.0f, 0.0f, 5.0f);
-	instances[1].position = XMFLOAT3(1.0f, 0.0f, 5.0f);
-	instances[2].position = XMFLOAT3(2.0f, 0.0f, 5.0f);*/
+
 
 	D3D11_BUFFER_DESC vertexBufferDesc = { sizeof(VertexType) * vertexCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
 	vertexData = { vertices, 0 , 0 };
@@ -265,8 +263,6 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count)
 }
 void InstanceCube::initBuffers(ID3D11Device* device)
 {
-	
-
 }
 
 void InstanceCube::sendData(ID3D11DeviceContext* deviceContext)
@@ -286,8 +282,6 @@ void InstanceCube::sendData(ID3D11DeviceContext* deviceContext)
 	// Set the array of pointers to the vertex and instance buffers.
 	bufferPointers[0] = vertexBuffer;
 	bufferPointers[1] = instanceBuffer;
-
-	
 
 	deviceContext->IASetVertexBuffers(0, 2, bufferPointers, stride, offset);
 	deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);

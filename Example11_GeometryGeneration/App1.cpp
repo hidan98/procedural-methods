@@ -13,9 +13,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
 
 	caveGen = new Cave();
-	caveGen->initializeMap(100, 100, chance);
+	caveGen->initializeMap(200, 200, height, 100);
 	cube = new InstanceCube(renderer->getDevice());
-	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
+	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), 200, 200, height);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
 	
@@ -38,15 +38,15 @@ bool App1::frame()
 
 	if (regen)
 	{
-		caveGen->initializeMap(100, 100, chance);
-		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
+		caveGen->initializeMap(width, depth, height, chance);
+		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 		regen = false;
 	}
 
 	if (step)
 	{
 		caveGen->step(death, alive);
-		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount());
+		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 		step = false;
 	}
 
@@ -116,10 +116,13 @@ void App1::gui()
 	}
 	else
 		step = false;
-	
+	ImGui::InputInt("Width", &width);
+	ImGui::InputInt("Height", &height);
+	ImGui::InputInt("Depth", &depth);
 	ImGui::InputInt("Chance", &chance);
 	ImGui::InputInt("death limit", &death);
 	ImGui::InputInt("ALive limit", &alive);
+
 
 	// Render UI
 	ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);

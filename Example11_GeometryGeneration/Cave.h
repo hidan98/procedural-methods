@@ -6,7 +6,7 @@ public:
 	Cave();
 	~Cave();
 
-	void initializeMap(int width, int depth, int chance);
+	void initializeMap(int width, int depth, int height, int chance);
 	bool* getCellMap() { return cellMap; }
 	void deleteMap();
 	void step(int dethLimit, int aliveLimit);
@@ -20,7 +20,9 @@ private:
 
 	bool* cellMap;
 
-
+	int randNum;
 	int count;
+
+	int width_, height_, depth_;
 };
 

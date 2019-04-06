@@ -7,7 +7,7 @@ public:
 	InstanceCube(ID3D11Device* device);
 	~InstanceCube();
 	void sendData(ID3D11DeviceContext* deviceContext);
-	void init(ID3D11Device* device, bool* cellMap, int count);
+	void init(ID3D11Device* device, bool* cellMap, int count, int width, int depth, int height);
 	int getInstanceCount() { return instanceCount; }
 	int getVertexCount() { return vertexCount; }
 protected:

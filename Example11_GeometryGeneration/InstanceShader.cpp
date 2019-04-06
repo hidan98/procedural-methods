@@ -115,7 +115,7 @@ void InstanceShader::render(ID3D11DeviceContext* deviceContext, int indexCount, 
 bool InstanceShader::load(WCHAR* name)
 {
 	ID3D10Blob* customeVertexShaderBuffer;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[4];
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[5];
 	ID3D10Blob* error;
 	HRESULT result;
 
@@ -169,6 +169,13 @@ bool InstanceShader::load(WCHAR* name)
 	polygonLayout[3].InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
 	polygonLayout[3].InstanceDataStepRate = 1;
 
+	polygonLayout[4].SemanticName = "COLOR";
+	polygonLayout[4].SemanticIndex = 0;
+	polygonLayout[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	polygonLayout[4].InputSlot = 1;
+	polygonLayout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygonLayout[4].InputSlotClass = D3D11_INPUT_PER_INSTANCE_DATA;
+	polygonLayout[4].InstanceDataStepRate = 1;
 
 	numberElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 

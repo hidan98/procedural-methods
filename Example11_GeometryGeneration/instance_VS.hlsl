@@ -5,6 +5,7 @@ struct InputType
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
 	float3 instancePosition : TEXCOORD1;
+	float4 colour : COLOR;
 };
 
 struct OutputType
@@ -12,6 +13,7 @@ struct OutputType
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float4 colour : COLOR;
 };
 
 cbuffer MatrixBuffer : register(b0)
@@ -42,6 +44,7 @@ OutputType main(InputType input)
 
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
+	output.colour = input.colour;
 
 	return output;
 }

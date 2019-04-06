@@ -6,7 +6,7 @@ Cave::Cave()
 {
 	srand(time(NULL));
 
-	cellMap = new bool[100* 100];
+	
 
 }
 
@@ -26,18 +26,23 @@ void Cave::deleteMap()
 	}
 }
 
-void Cave::initializeMap(int width, int depth, int chance)
+void Cave::initializeMap(int width, int depth, int height, int chance)
 {
-	//deleteMap();
+	deleteMap();
+	width_ = width;
+	depth_ = depth;
+	height_ = height;
+	cellMap = new bool[width_ * depth_];
+	
 	count = 0;
 	
 	int index;
-	for (int x = 0; x < width; x++)
+	for (int x = 0; x < depth_; x++)
 	{		
-		for (int z = 0; z < depth; z++)
+		for (int z = 0; z < width_; z++)
 		{
-			index = (width * x) + z;
-			int randNum = rand() % 100;
+			index = (depth_ * x) + z;
+			randNum = rand() % 100;
 			if (randNum < chance)
 			{
 				cellMap[index] = true;
@@ -51,14 +56,14 @@ void Cave::initializeMap(int width, int depth, int chance)
 
 void Cave::step(int dethLimit, int aliveLimit)
 {
-	newCellMap = new bool[100 * 100];
+	newCellMap = new bool[width_ * height_];
 	count = 0;
 	int index = 0;
-	for (int i = 0; i < 100; i++)
+	for (int i = 0; i < width_; i++)
 	{
-		for (int j = 0; j < 100; j++)
+		for (int j = 0; j < depth_; j++)
 		{
-			index = (100 * i) + j;
+			index = (width_ * i) + j;
 			int aliveNbs = getAlive(j, i);
 
 			if (cellMap[index])
@@ -89,7 +94,7 @@ void Cave::step(int dethLimit, int aliveLimit)
 		}
 	}
 	
-	memcpy(cellMap, newCellMap, sizeof(bool) * 100 * 100);
+	memcpy(cellMap, newCellMap, sizeof(bool) * width_ * depth_);
 	delete[] newCellMap;
 	newCellMap = nullptr;
 	
@@ -102,10 +107,10 @@ int Cave::getAlive(int x, int y)
 	{
 		for (int i = -1; i < 2; i++)
 		{
-			int index = (100 * y + j) + i + x;
+			int index = (width_ * y + j) + i + x;
 			if (j != 0 && i != 0)
 			{
-				if (index >= 0 && index <= 100 * 100)
+				if (index >= 0 && index <= width_ * depth_)
 				{
 					if (cellMap[index])
 					{
