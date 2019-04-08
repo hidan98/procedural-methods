@@ -4,9 +4,7 @@
 
 Cave::Cave()
 {
-	srand(time(NULL));
-
-	
+	srand(time(NULL));	
 
 }
 
@@ -32,96 +30,169 @@ void Cave::initializeMap(int width, int depth, int height, int chance)
 	width_ = width;
 	depth_ = depth;
 	height_ = height;
-	cellMap = new bool[width_ * depth_];
+	cellMap = new bool[width_ * depth_ * height_];
 	
 	count = 0;
 	
 	int index;
 
-	for (int z = 0; z < depth_; z++)
-	{		
-		for (int x = 0; x < width_; x++)
-		{
-			index = (width_ * z) + x;
-			randNum = rand() % 100;
-			if (randNum < chance)
-			{
-				cellMap[index] = true;
-				count++;
-			}
-			else
-				cellMap[index] = false;
-		}
-	}
-}
-
-void Cave::step(int dethLimit, int aliveLimit)
-{
-	newCellMap = new bool[width_ * height_];
-	count = 0;
-	int index = 0;
-	for (int i = 0; i < width_; i++)
+	for (int x = 0; x < width_; x++)
 	{
-		for (int j = 0; j < depth_; j++)
+		for (int y = 0; y < height_; y++)
 		{
-			index = (width_ * i) + j;
-			int aliveNbs = getAlive(j, i);
-
-			if (cellMap[index])
+			for (int z = 0; z < depth_; z++)
 			{
-				if (aliveNbs < dethLimit)
+				index = (x * height_ * depth_) + (y * depth_) + z;
+				randNum = rand() % 100;
+				if (randNum < chance)
 				{
-					newCellMap[index] = false;
-				}
-				else
-				{
-					newCellMap[index] = true;
-					count++;
-				}
-			}
-			else
-			{
-				if (aliveNbs > aliveLimit)
-				{
-					newCellMap[index] = true;
+					cellMap[index] = true;
 					count++;
 				}
 				else
-				{
-					newCellMap[index] = false;
-				}
+					cellMap[index] = false;
 			}
-			
 		}
 	}
 	
-	memcpy(cellMap, newCellMap, sizeof(bool) * width_ * depth_);
+}
+void Cave::stepB678_S345678()
+{
+	newCellMap = new bool[width_ * depth_ * height_];
+	count = 0;
+	int index = 0;
+
+	for (int x = 0; x < width_; x++)
+	{
+		for (int y = 0; y < height_; y++)
+		{
+			for (int z = 0; z < depth_; z++)
+			{
+				index = (x * height_ * depth_) + (y * depth_) + z;
+
+				int aliveNbs = getAlive(x, y, z);
+
+				if (cellMap[index])
+				{
+					if (aliveNbs < 3)
+					{
+						newCellMap[index] = false;
+						//count++;
+					}
+					else
+					{
+						newCellMap[index] = true;
+						count++;
+					}
+				}
+				else
+				{
+					if (aliveNbs > 5)
+					{
+						newCellMap[index] = true;
+						count++;
+					}
+					else
+					{
+						newCellMap[index] = false;
+					}
+				}
+			}
+		}
+	}
+
+	memcpy(cellMap, newCellMap, sizeof(bool) * width_ * depth_ * height_);
+	delete[] newCellMap;
+	newCellMap = nullptr;
+
+}
+
+void Cave::step(int lonelyLimit, int overPop, int liveLim)
+{
+	newCellMap = new bool[width_ * depth_ * height_];
+	count = 0;
+	int index = 0;
+	
+	for (int x = 0; x < width_; x++)
+	{
+		for (int y = 0; y < height_; y++)
+		{
+			for (int z = 0; z < depth_; z++)
+			{
+				index = (x * height_ * depth_) + (y * depth_) + z;
+				
+				int aliveNbs = getAlive(x, y, z);
+
+				if (cellMap[index])
+				{
+					if (aliveNbs < lonelyLimit)
+					{
+						newCellMap[index] = false;
+					}
+					else if (aliveNbs > overPop)
+					{
+						newCellMap[index] = false;
+					}
+					else
+					{
+						newCellMap[index] = true;
+						count++;
+					}
+				}
+				else
+				{
+					if (aliveNbs == liveLim)
+					{
+						newCellMap[index] = true;
+						count++;
+					}
+					else
+					{
+						newCellMap[index] = false;
+					}
+				}
+
+			}
+		}
+	}
+	
+	
+	memcpy(cellMap, newCellMap, sizeof(bool) * width_ * depth_ * height_);
 	delete[] newCellMap;
 	newCellMap = nullptr;
 	
 }
 
-int Cave::getAlive(int x, int y)
+int Cave::getAlive(int x, int y, int z)
 {
 	int alive = 0;
-	for (int j = -1; j < 2; j++)
+	for (int i = -1; i < 2; i++)
 	{
-		for (int i = -1; i < 2; i++)
+		for (int j = -1; j < 2; j++)
 		{
-			int index = (width_ * y + j) + i + x;
-			if (j != 0 && i != 0)
+			for (int k = -1; k < 2; k++)
 			{
-				if (index >= 0 && index <= width_ * depth_)
+				//int index = (j + z) + height_ * ((k + y) + width_ * (i + x));
+				int index = ((x + i) * height_ * depth_) + ((y +j) * depth_) + (z + k);
+
+				//int index = (width_ * y + j) + i + x;
+				if (j != 0 && i != 0 && k !=0)
 				{
-					if (cellMap[index])
+					if (index < 0 || index > width_ * depth_ * height_)
+					{
+						//alive++;
+						
+					}
+					else if(cellMap[index])
 					{
 						alive++;
 					}
 				}
-			}
 
+			}
 		}
 	}
+	
 	return alive;
 
 }

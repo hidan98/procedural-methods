@@ -30,7 +30,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	//front face
 	vertices[0].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	vertices[0].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[0].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[0].texture = XMFLOAT2(0.f, 0.0f);
 	indices[0] = 0;
 
 	vertices[1].position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -40,12 +40,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[2].position = XMFLOAT3(1.0f, 1.0f, 0.0f);
 	vertices[2].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[2].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[2].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[2] = 2;
 
 	vertices[3].position = XMFLOAT3(1.0f, 1.0f, 0.0f);
 	vertices[3].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[3].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[3].texture = XMFLOAT2(1.f, 0.0f);
 	indices[3] = 3;
 
 	vertices[4].position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -63,7 +63,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	//top face
 	vertices[6].position = XMFLOAT3(0.0f, 1.0f, 1.0f);
 	vertices[6].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[6].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[6].texture = XMFLOAT2(0.0f, 0.0f);
 	indices[6] = 6;
 
 	vertices[7].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -73,12 +73,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[8].position = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	vertices[8].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[8].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[8].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[8] = 8;
 
 	vertices[9].position = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	vertices[9].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[9].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[9].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[9] = 9;
 
 	vertices[10].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -97,7 +97,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[12].position = XMFLOAT3(0.0f, 1.0f, 1.0f);
 	vertices[12].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[12].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[12].texture = XMFLOAT2(0.0f, 0.0f);
 	indices[12] = 17;
 
 	vertices[13].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -107,12 +107,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[14].position = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	vertices[14].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[14].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[14].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[14] = 15;
 
 	vertices[15].position = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	vertices[15].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[15].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[15].texture = XMFLOAT2(1.f, 0.0f);
 	indices[15] = 14;
 
 	vertices[16].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -129,7 +129,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[18].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
 	vertices[18].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[18].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[18].texture = XMFLOAT2(0.0f, 0.0f);
 	indices[18] = 23;
 
 	vertices[19].position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -139,12 +139,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[20].position = XMFLOAT3(1.0f, 0.0f, 1.0f);
 	vertices[20].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[20].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[20].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[20] = 21;
 
 	vertices[21].position = XMFLOAT3(1.0f, 0.0f, 1.0f);
 	vertices[21].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[21].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[21].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[21] = 20;
 
 	vertices[22].position = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -161,7 +161,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[24].position = XMFLOAT3(0.0f, 1.0f, 1.0f);
 	vertices[24].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[24].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[24].texture = XMFLOAT2(0.0f, 0.0f);
 	indices[24] = 24;
 
 	vertices[25].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -171,12 +171,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[26].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	vertices[26].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[26].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[26].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[26] = 26;
 
 	vertices[27].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	vertices[27].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[27].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[27].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[27] = 27;
 
 	vertices[28].position = XMFLOAT3(0.0f, 0.0f, 1.0f);
@@ -193,7 +193,7 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	//right face
 	vertices[30].position = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	vertices[30].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[30].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[30].texture = XMFLOAT2(0.0f, 0.0f);
 	indices[30] = 35;
 
 	vertices[31].position = XMFLOAT3(1.0f, 0.0f, 1.0f);
@@ -203,12 +203,12 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 
 	vertices[32].position = XMFLOAT3(1.0f, 1.0f, 0.0f);
 	vertices[32].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[32].texture = XMFLOAT2(1.0f, 1.0f);
+	vertices[32].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[32] = 33;
 
 	vertices[33].position = XMFLOAT3(1.0f, 1.0f, 0.0f);
 	vertices[33].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
-	vertices[33].texture = XMFLOAT2(0.5f, 0.0f);
+	vertices[33].texture = XMFLOAT2(1.0f, 0.0f);
 	indices[33] = 32;
 
 	vertices[34].position = XMFLOAT3(1.0f, 0.0f, 1.0f);
@@ -222,24 +222,28 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	indices[35] = 30;
 
 
-	int index;
+	int index = 0;
 	int pos = 0;
-	for (int z = 0; z < depth; z++)
+	it = 0;
+	for (int x = 0; x < width; x++)
 	{
-		for (int x = 0; x < width; x++)
+		for (int y = 0; y < height; y++)
 		{
-			index = (width * z) + x;
-			if (cellMap[index])
+			for (int z = 0; z < depth; z++)
 			{
-				instances[pos].position = XMFLOAT3(x, 0.f, z);
-				instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
-				pos++;
+				index = (x * height * depth) + (y * depth) + z;
+				it++;
+				if (cellMap[index])
+				{
+					instances[pos].position = XMFLOAT3(x, y, z);
+					instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
+					pos++;
+				}
 			}
+
 		}
-
 	}
-
-
+	
 	D3D11_BUFFER_DESC vertexBufferDesc = { sizeof(VertexType) * vertexCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
 	vertexData = { vertices, 0 , 0 };
 	device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);

@@ -68,7 +68,7 @@ void InstanceShader::initShader(WCHAR* vertex, WCHAR* pixel)
 
 }
 
-void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, int indexCount, int instanceCount)
+void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, int indexCount, int instanceCount, ID3D11ShaderResourceView* texture)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -87,7 +87,7 @@ void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, cons
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
-	//deviceContext->PSSetShaderResources(0, 1, &texture);
+	deviceContext->PSSetShaderResources(0, 1, &texture);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
 
 	//deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);

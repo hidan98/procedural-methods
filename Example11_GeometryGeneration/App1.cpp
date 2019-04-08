@@ -11,11 +11,15 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 {
 	// Call super/parent init function (required!)
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
+	width = 10;
+	depth = 10; 
+	height = 2;
+	textureMgr->loadTexture("brick", L"../res/bunny.png");
 
 	caveGen = new Cave();
-	caveGen->initializeMap(200, 200, height, 100);
+	caveGen->initializeMap(width, depth, height, 100);
 	cube = new InstanceCube(renderer->getDevice());
-	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), 200, 200, height);
+	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
 	
@@ -45,7 +49,8 @@ bool App1::frame()
 
 	if (step)
 	{
-		caveGen->step(death, alive);
+		caveGen->stepB678_S345678();
+		//caveGen->step(death, alive, livelim);
 		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 		step = false;
 	}
@@ -79,9 +84,10 @@ bool App1::render()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
+	//worldMatrix = XMMatrixScaling(5.0f, 5.0f, 5.0f);
 	// Send geometry data, set shader parameters, render object with shader
 	cube->sendData(renderer->getDeviceContext());
-	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount());
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
 	shader->render(renderer->getDeviceContext(), cube->getIndexCount(), cube->getInstanceCount());
 
 	// Render GUI
@@ -120,8 +126,9 @@ void App1::gui()
 	ImGui::InputInt("Height", &height);
 	ImGui::InputInt("Depth", &depth);
 	ImGui::InputInt("Chance", &chance);
-	ImGui::InputInt("death limit", &death);
-	ImGui::InputInt("ALive limit", &alive);
+	ImGui::InputInt("lonely limit", &death);
+	ImGui::InputInt("overPop limit", &alive);
+	ImGui::InputInt("Live again lim", &livelim);
 
 
 	// Render UI

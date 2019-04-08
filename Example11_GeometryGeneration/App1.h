@@ -37,6 +37,7 @@ private:
 	int chance;
 	int death;
 	int alive;
+	int livelim;
 
 	int width, height, depth;
 };

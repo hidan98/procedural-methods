@@ -15,5 +15,7 @@ protected:
 	void initBuffers(ID3D11Device* device);
 	int instanceCount;
 
+	int it;
+
 };
 
