@@ -11,9 +11,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 {
 	// Call super/parent init function (required!)
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
-	width = 10;
-	depth = 10; 
-	height = 2;
+	width = 1;
+	depth = 1; 
+	height = 1;
 	textureMgr->loadTexture("brick", L"../res/bunny.png");
 
 	caveGen = new Cave();

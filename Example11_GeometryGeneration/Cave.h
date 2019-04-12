@@ -6,7 +6,8 @@ struct cells
 {
 	bool active;
 	XMFLOAT3 position;
-
+	XMFLOAT4 colour;
+	int num;
 };
 
 class Cave
