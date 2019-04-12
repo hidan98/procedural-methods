@@ -22,7 +22,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
-	
+	close = false;
 }
 
 
@@ -35,10 +35,25 @@ App1::~App1()
 
 }
 
+void App1::Cavestep()
+{
+	caveGen->stepB678_S345678();
+	//caveGen->step(death, alive, livelim);
+	
+	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
+	//caveStep->join();
+	//close = true;
+}
 
 bool App1::frame()
 {
 	bool result;
+
+	if (close)
+	{
+		caveStep->join();
+		close = false;
+	}
 
 	if (regen)
 	{
@@ -49,9 +64,9 @@ bool App1::frame()
 
 	if (step)
 	{
-		caveGen->stepB678_S345678();
-		//caveGen->step(death, alive, livelim);
-		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
+		//caveStep = new std::thread([&] {Cavestep(); });
+		Cavestep();
+		
 		step = false;
 	}
 

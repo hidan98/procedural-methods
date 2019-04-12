@@ -1,4 +1,5 @@
 #include "InstanceCube.h"
+#include "Cave.h"
 
 
 
@@ -12,20 +13,54 @@ InstanceCube::~InstanceCube()
 {
 	BaseMesh::~BaseMesh();
 }
-void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int width, int depth, int height)
+void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count, int width, int depth, int height)
 {
+	//initBuffers(device);
+	D3D11_SUBRESOURCE_DATA instanceData;
 
+	instanceCount = count;
+	
+	InstanceType* instances = new InstanceType[instanceCount];
 
-	D3D11_SUBRESOURCE_DATA vertexData, indexData, instanceData;
+	int index = 0;
+	int pos = 0;
+	it = 0;
 
+	for (int z = 0; z < depth; z++)
+	{
+		/*for (int y = 0; y < height; y++)
+		{*/
+		for (int x = 0; x < width; x++)
+			{
+				index = (z * depth + x);
+				//index = (x * width + z);// * depth) + (y * depth) + z;
+				it++;
+				if (cellMap[index].active)
+				{
+					instances[pos].position = cellMap[index].position;
+					instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
+					pos++;
+				}
+			}
 
+		//}
+	}
+
+	D3D11_BUFFER_DESC instanceBufferDesc = { sizeof(InstanceType)* instanceCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
+	instanceData = { instances ,0,0 };
+	device->CreateBuffer(&instanceBufferDesc, &instanceData, &instanceBuffer);
+
+	delete[] instances;
+	instances = 0;
+}
+void InstanceCube::initBuffers(ID3D11Device* device)
+{
+	D3D11_SUBRESOURCE_DATA vertexData, indexData;
 	vertexCount = 36;
 	indexCount = 36;
-	instanceCount = count;
-	VertexType* vertices = new VertexType[vertexCount];
-	InstanceType* instances = new InstanceType[instanceCount];
-	unsigned long* indices = new unsigned long[indexCount];
 
+	VertexType* vertices = new VertexType[vertexCount];
+	unsigned long* indices = new unsigned long[indexCount];
 
 	//front face
 	vertices[0].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -221,29 +256,6 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	vertices[35].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[35] = 30;
 
-
-	int index = 0;
-	int pos = 0;
-	it = 0;
-	for (int x = 0; x < width; x++)
-	{
-		for (int y = 0; y < height; y++)
-		{
-			for (int z = 0; z < depth; z++)
-			{
-				index = (x * height * depth) + (y * depth) + z;
-				it++;
-				if (cellMap[index])
-				{
-					instances[pos].position = XMFLOAT3(x, y, z);
-					instances[pos].colour = XMFLOAT4(0.112f, 0.128f, 0.144f, 1.0f);
-					pos++;
-				}
-			}
-
-		}
-	}
-	
 	D3D11_BUFFER_DESC vertexBufferDesc = { sizeof(VertexType) * vertexCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
 	vertexData = { vertices, 0 , 0 };
 	device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
@@ -252,21 +264,11 @@ void InstanceCube::init(ID3D11Device* device, bool* cellMap, int count, int widt
 	indexData = { indices, 0, 0 };
 	device->CreateBuffer(&indexBufferDesc, &indexData, &indexBuffer);
 
-	D3D11_BUFFER_DESC instanceBufferDesc = { sizeof(InstanceType)* instanceCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
-	instanceData = { instances ,0,0 };
-	device->CreateBuffer(&instanceBufferDesc, &instanceData, &instanceBuffer);
-
 	// Release the arrays now that the vertex and index buffers have been created and loaded.
 	delete[] vertices;
 	vertices = 0;
 	delete[] indices;
 	indices = 0;
-
-	delete[] instances;
-	instances = 0;
-}
-void InstanceCube::initBuffers(ID3D11Device* device)
-{
 }
 
 void InstanceCube::sendData(ID3D11DeviceContext* deviceContext)

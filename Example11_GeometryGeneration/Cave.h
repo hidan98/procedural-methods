@@ -1,5 +1,14 @@
 #pragma once
 #include <vector>
+#include "D3D.h"
+
+struct cells
+{
+	bool active;
+	XMFLOAT3 position;
+
+};
+
 class Cave
 {
 public:
@@ -7,19 +16,21 @@ public:
 	~Cave();
 
 	void initializeMap(int width, int depth, int height, int chance);
-	bool* getCellMap() { return cellMap; }
+	cells* getCellMap() { return cellMap; }
 	void deleteMap();
 	void step(int dethLimit, int aliveLimit, int liveLim);
 	void stepB678_S345678();
 	int getCount(){return count;}
 
+
+
 private:
 	int getAlive(int x, int y, int z);
 
-	bool* oldCellMap;
-	bool* newCellMap;
+	cells* oldCellMap;
+	cells* newCellMap;
 
-	bool* cellMap;
+	cells* cellMap;
 
 	int randNum;
 	int count;

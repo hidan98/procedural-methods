@@ -8,6 +8,7 @@
 #include "InstanceCube.h"
 #include "InstanceShader.h"
 #include"Cave.h"
+#include <thread>
 
 class App1 : public BaseApplication
 {
@@ -22,6 +23,8 @@ public:
 protected:
 	bool render();
 	void gui();
+
+	void Cavestep();
 
 private:
 	GeometryShader* geometryShader;
@@ -40,6 +43,9 @@ private:
 	int livelim;
 
 	int width, height, depth;
+
+	std::thread* caveStep;
+	bool close;
 };
 
 #endif
