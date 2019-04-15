@@ -21,6 +21,7 @@ public:
 	void deleteMap();
 	void step(int dethLimit, int aliveLimit, int liveLim);
 	void stepB678_S345678();
+	void stepB17_18_19_S13_14_16_();
 	int getCount(){return count;}
 
 
@@ -28,7 +29,6 @@ public:
 private:
 	int getAlive(int x, int y, int z);
 
-	cells* oldCellMap;
 	cells* newCellMap;
 
 	cells* cellMap;

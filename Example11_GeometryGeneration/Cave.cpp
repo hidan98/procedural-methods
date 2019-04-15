@@ -5,13 +5,24 @@
 Cave::Cave()
 {
 	srand(time(NULL));	
+	cellMap = nullptr;
+
 }
 
 
 Cave::~Cave()
 {
-	delete[] cellMap;
-	cellMap = nullptr;
+	if (cellMap)
+	{
+		delete[] cellMap;
+		cellMap = nullptr;
+	}
+	
+	if (newCellMap)
+	{
+		delete[] newCellMap;
+		newCellMap = nullptr;
+	}
 }
 
 void Cave::deleteMap()
@@ -89,6 +100,61 @@ void Cave::initializeMap(int width, int depth, int height, int chance)
 		}
 	}
 	
+}
+void Cave::stepB17_18_19_S13_14_16_()
+{
+	newCellMap = new cells[width_* depth_ * height_];
+	count = 0;
+	int index = 0;
+
+
+	for (int z = 0; z < depth_; z++)
+	{
+		for (int y = 0; y < height_; y++)
+		{
+			for (int x = 0; x < width_; x++)
+			{
+				index = (z * height_ * width_) + (y*width_) + x;
+
+				int aliveNbs = getAlive(x, y, z);
+
+				
+				if (cellMap[index].active)
+				{
+					if ((aliveNbs > 12))
+					{
+						newCellMap[index].active = false;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+						//count++;
+					}
+					else
+					{
+						newCellMap[index].active = true;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+						count++;
+					}
+				}
+				else
+				{
+					if ((aliveNbs == 14) || (aliveNbs == 17) || (aliveNbs == 18) || (aliveNbs == 19))
+					{
+						newCellMap[index].active = true;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+						count++;
+					}
+					else
+					{
+						newCellMap[index].active = false;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+					}
+				}
+			}
+		}
+	}
+
+	memcpy(cellMap, newCellMap, sizeof(cells) * width_ * depth_ * height_);
+	delete[] newCellMap;
+	newCellMap = nullptr;
 }
 void Cave::stepB678_S345678()
 {
@@ -222,8 +288,9 @@ int Cave::getAlive(int x, int y, int z)
 				int tempZ = z + i;
 				index = (tempZ * height_ * width_) + (tempY*width_) + tempX;
 
-				if ((tempX >= 0) && (tempY >= 0) && (tempZ >= 0))
+				if ((tempX >= 0 && tempX <width_) && (tempY >= 0 && tempY < height_) && (tempZ >= 0 && tempZ <  depth_))
 				{
+
 					if ((i != 0) || (k != 0) || (j != 0))
 					{
 						if (index < 0 || index > width_ * depth_ * height_ -1)

@@ -33,16 +33,24 @@ App1::~App1()
 
 	// Release the Direct3D object.
 
+	delete caveGen;
+	caveGen = nullptr;
+
+	delete cube;
+	cube = nullptr;
+
+	delete shader;
+	shader = nullptr;
 }
 
 void App1::Cavestep()
 {
-	caveGen->stepB678_S345678();
+	caveGen->stepB17_18_19_S13_14_16_();
 	//caveGen->step(death, alive, livelim);
 	
 	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
 	//caveStep->join();
-	//close = true;
+	close = true;
 }
 
 bool App1::frame()
@@ -64,8 +72,8 @@ bool App1::frame()
 
 	if (step)
 	{
-		//caveStep = new std::thread([&] {Cavestep(); });
-		Cavestep();
+		caveStep = new std::thread([&] {Cavestep(); });
+		//Cavestep();
 		
 		step = false;
 	}
@@ -99,7 +107,7 @@ bool App1::render()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	//worldMatrix = XMMatrixScaling(5.0f, 5.0f, 5.0f);
+	//worldMatrix = XMMatrixScaling(0.10f, 0.10f, 0.100f);
 	// Send geometry data, set shader parameters, render object with shader
 	cube->sendData(renderer->getDeviceContext());
 	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
