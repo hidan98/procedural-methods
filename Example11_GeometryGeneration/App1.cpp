@@ -17,9 +17,9 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	textureMgr->loadTexture("brick", L"../res/bunny.png");
 
 	caveGen = new Cave();
-	caveGen->initializeMap(width, depth, height, 100);
+	caveGen->initalize2DMap(width, depth, 100);
 	cube = new InstanceCube(renderer->getDevice());
-	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
+	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
 	close = false;
@@ -45,10 +45,10 @@ App1::~App1()
 
 void App1::Cavestep()
 {
-	caveGen->stepB17_18_19_S13_14_16_();
+	caveGen->life2D();
 	//caveGen->step(death, alive, livelim);
 	
-	cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
+	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
 	//caveStep->join();
 	close = true;
 }
@@ -57,23 +57,23 @@ bool App1::frame()
 {
 	bool result;
 
-	if (close)
+	/*if (close)
 	{
 		caveStep->join();
 		close = false;
-	}
+	}*/
 
 	if (regen)
 	{
-		caveGen->initializeMap(width, depth, height, chance);
-		cube->init(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth, height);
+		caveGen->initalize2DMap(width, depth, chance);
+		cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
 		regen = false;
 	}
 
 	if (step)
 	{
-		caveStep = new std::thread([&] {Cavestep(); });
-		//Cavestep();
+		//caveStep = new std::thread([&] {Cavestep(); });
+		Cavestep();
 		
 		step = false;
 	}

@@ -17,6 +17,7 @@ public:
 	~Cave();
 
 	void initializeMap(int width, int depth, int height, int chance);
+	void initalize2DMap(int width, int depth, int chance);
 	cells* getCellMap() { return cellMap; }
 	void deleteMap();
 	void step(int dethLimit, int aliveLimit, int liveLim);
@@ -24,6 +25,9 @@ public:
 	void stepB17_18_19_S13_14_16_();
 	int getCount(){return count;}
 
+	void life2D();
+
+	int getAlive2D(int x, int z);
 
 
 private:
@@ -32,6 +36,9 @@ private:
 	cells* newCellMap;
 
 	cells* cellMap;
+	cells* stack;
+	cells* stackCopy;
+	cells* newStack;
 
 	int randNum;
 	int count;

@@ -53,6 +53,43 @@ void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count, int wid
 	delete[] instances;
 	instances = 0;
 }
+void InstanceCube::Init2D(ID3D11Device* device, cells* cellMap, int count, int width, int depth)
+{
+	D3D11_SUBRESOURCE_DATA instanceData;
+
+	instanceCount = count;
+
+	InstanceType* instances = new InstanceType[instanceCount];
+
+	int index = 0;
+	int pos = 0;
+	it = 0;
+
+	for (int z = 0; z < depth; z++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			index = (z*width) + x;
+			it++;
+			if (cellMap[index].active)
+			{
+				instances[pos].position = cellMap[index].position;
+				instances[pos].colour = cellMap[index].colour;
+				pos++;
+			}
+		}
+
+
+	}
+
+	D3D11_BUFFER_DESC instanceBufferDesc = { sizeof(InstanceType)* instanceCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
+	instanceData = { instances ,0,0 };
+	device->CreateBuffer(&instanceBufferDesc, &instanceData, &instanceBuffer);
+
+	delete[] instances;
+	instances = 0;
+}
+
 void InstanceCube::initBuffers(ID3D11Device* device)
 {
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
