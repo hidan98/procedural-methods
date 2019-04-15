@@ -24,6 +24,8 @@ public:
 	void stepB678_S345678();
 	void stepB17_18_19_S13_14_16_();
 	int getCount(){return count;}
+	cells* getStack() { return stack; }
+	int getHeight() { return stepHeight; }
 
 	void life2D();
 
@@ -43,6 +45,6 @@ private:
 	int randNum;
 	int count;
 
-	int width_, height_, depth_;
+	int width_, height_, depth_, stepHeight;;
 };
 

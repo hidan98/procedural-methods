@@ -38,7 +38,7 @@ void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count, int wid
 				if (cellMap[index].active)
 				{
 					instances[pos].position = cellMap[index].position;
-					instances[pos].colour = cellMap[index].colour;
+					instances[pos].colour = XMFLOAT4(1.0f, 0.f, 0.0f, 1.0f);
 					pos++;
 				}
 			}

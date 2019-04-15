@@ -48,7 +48,7 @@ void App1::Cavestep()
 	caveGen->life2D();
 	//caveGen->step(death, alive, livelim);
 	
-	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
+	cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount(), width, depth, caveGen->getHeight());
 	//caveStep->join();
 	close = true;
 }
