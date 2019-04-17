@@ -6,8 +6,6 @@ Cave::Cave()
 {
 	srand(time(NULL));	
 	cellMap = nullptr;
-	
-
 }
 
 
@@ -96,7 +94,7 @@ void Cave::initializeMap(int width, int depth, int height, int chance)
 				else
 				{
 					cellMap[index].active = false;
-					cellMap[index].num = temp;
+					
 				}
 				temp++;
 			}
@@ -114,7 +112,7 @@ void Cave::initalize2DMap(int width, int depth, int chance)
 	height_ = 1;
 	stepHeight = 1;
 	cellMap = new cells[width_ * depth_ ];
-	stack = new cells[width_ * depth_];
+	
 
 	count = 0;
 
@@ -138,14 +136,28 @@ void Cave::initalize2DMap(int width, int depth, int chance)
 			else
 			{
 				cellMap[index].active = false;
-				cellMap[index].num = temp;
 			}
 			temp++;
 		}
 		
 	}
+	stack = new cells[count];
 
-	memcpy(stack, cellMap, sizeof(cells) * width_ * depth_ * stepHeight);
+
+	int iterator = 0;
+	for (int z = 0; z < depth_; z++)
+	{
+		for (int x = 0; x < width_; x++)
+		{
+			index = (z * width_) + x;
+			if (cellMap[index].active)
+			{
+				stack[iterator] = cellMap[index];
+				iterator++;
+			}
+		}
+	}
+
 }
 
 void Cave::stepB17_18_19_S13_14_16_()
@@ -256,7 +268,6 @@ void Cave::stepB678_S345678()
 	memcpy(cellMap, newCellMap, sizeof(cells) * width_ * depth_ * height_);
 	delete[] newCellMap;
 	newCellMap = nullptr;
-
 }
 
 void Cave::step(int lonelyLimit, int overPop, int liveLim)
@@ -308,22 +319,18 @@ void Cave::step(int lonelyLimit, int overPop, int liveLim)
 						cellMap[index].position = XMFLOAT3(x, y, z);
 					}
 				}
-
 			}
 		}
 	}
 
-
 	memcpy(cellMap, newCellMap, sizeof(cells) * width_ * depth_ * stepHeight);
 	delete[] newCellMap;
 	newCellMap = nullptr;
-
-	
-
 }
 
 void Cave::life2D()
 {
+	oldCount = count;
 	stepHeight++;
 	newCellMap = new cells[width_ * depth_];
 	//count = 0;
@@ -375,46 +382,111 @@ void Cave::life2D()
 	delete[] newCellMap;
 	newCellMap = nullptr;
 
-	
-	newStack = new cells[width_* depth_ * stepHeight];
-	
+	newStack = new cells[count];
 
-	memcpy(newStack, stack, sizeof(cells) * width_ * depth_ * (stepHeight -1 ));
+	memcpy(newStack, stack, sizeof(cells) * oldCount);
 	delete[] stack;
 	stack = nullptr;
 
-
-	
-
-	int temp = 0;
-
+	int iterator = oldCount;
 	for (int z = 0; z < depth_; z++)
 	{
 		for (int x = 0; x < width_; x++)
 		{
 			index = (z * width_) + x;
-			int newIndex;
-			
-			newIndex = (index) + (width_) * (depth_) * (stepHeight -1);			 
-			
-			newStack[newIndex] = cellMap[index];
-		}
-
-	}
-	/*for (int z = 0; z < depth_; z++)
-	{
-		for (int y = stepHeight - 1; y < stepHeight; y++)
-		{
-			for (int x = 0; x < width_; x++)
+			if (cellMap[index].active)
 			{
-				index = (z * stepHeight * width_) + (y*width_) + x;
-				newStack[index] = cellMap[temp];
-				temp++;
+				newStack[iterator] = cellMap[index];
+				iterator++;
 			}
 		}
-	}*/
-	stack = new cells[width_ * depth_ * stepHeight];
-	memcpy(stack, newStack, sizeof(cells) * width_ * depth_ * stepHeight);
+	}
+
+
+	stack = new cells[count];
+	memcpy(stack, newStack, sizeof(cells) * count);
+	delete[] newStack;
+	newStack = nullptr;
+}
+
+
+void Cave::pseudoLife2D()
+{
+	oldCount = count;
+	stepHeight++;
+	newCellMap = new cells[width_ * depth_];
+	//count = 0;
+	int index = 0;
+
+	for (int z = 0; z < depth_; z++)
+	{
+
+		for (int x = 0; x < width_; x++)
+		{
+			index = (z * width_) + x;
+
+			int aliveNbs = getAlive2D(x, z);
+
+			if (cellMap[index].active)
+			{
+				if ((aliveNbs == 2) || (aliveNbs == 3) || (aliveNbs == 8))
+				{
+					newCellMap[index].active = true;
+					newCellMap[index].position = XMFLOAT3(x, stepHeight, z);
+					count++;
+				}
+
+				else
+				{
+					newCellMap[index].active = false;
+					newCellMap[index].position = XMFLOAT3(x, stepHeight, z);
+					//count++;
+				}
+			}
+			else
+			{
+				if ((aliveNbs == 3) || (aliveNbs == 3) || (aliveNbs == 7))
+				{
+					newCellMap[index].active = true;
+					newCellMap[index].position = XMFLOAT3(x, stepHeight, z);
+					count++;
+				}
+				else
+				{
+					newCellMap[index].active = false;
+					newCellMap[index].position = XMFLOAT3(x, stepHeight, z);
+				}
+			}
+		}
+	}
+
+	memcpy(cellMap, newCellMap, sizeof(cells) * width_ * depth_);
+	delete[] newCellMap;
+	newCellMap = nullptr;
+
+	newStack = new cells[count];
+
+	memcpy(newStack, stack, sizeof(cells) * oldCount);
+	delete[] stack;
+	stack = nullptr;
+
+	int iterator = oldCount;
+	for (int z = 0; z < depth_; z++)
+	{
+		for (int x = 0; x < width_; x++)
+		{
+			index = (z * width_) + x;
+			if (cellMap[index].active)
+			{
+				newStack[iterator] = cellMap[index];
+				iterator++;
+			}
+		}
+	}
+
+
+	stack = new cells[count];
+	memcpy(stack, newStack, sizeof(cells) * count);
 	delete[] newStack;
 	newStack = nullptr;
 }
@@ -436,24 +508,18 @@ int Cave::getAlive(int x, int y, int z)
 
 				if ((tempX >= 0 && tempX <width_) && (tempY >= 0 && tempY < height_) && (tempZ >= 0 && tempZ <  depth_))
 				{
-
 					if ((i != 0) || (k != 0) || (j != 0))
 					{
 						if (index < 0 || index > width_ * depth_ * height_ -1)
 						{
 							//alive--;
-
 						}
 						else if (cellMap[index].active)
-						{
-							
+						{							
 							alive++;
 						}
 					}
 				}
-				
-				
-
 			}
 		}
 	}
@@ -476,24 +542,19 @@ int Cave::getAlive2D(int x, int z)
 
 			if ((tempX >= 0 && tempX <width_) && (tempZ >= 0 && tempZ <  depth_))
 			{
-
 				if ((i != 0) || (k != 0))
 				{
 					if (index < 0 || index > width_ * depth_ - 1)
 					{
 						//alive--;
-
 					}
 					else if (cellMap[index].active)
 					{
-
 						alive++;
 					}
 				}
 			}
-		}
-		
+		}		
 	}
-
 	return alive;
 }

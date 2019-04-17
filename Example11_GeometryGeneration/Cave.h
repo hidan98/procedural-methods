@@ -7,7 +7,6 @@ struct cells
 	bool active;
 	XMFLOAT3 position;
 	XMFLOAT4 colour;
-	int num;
 };
 
 class Cave
@@ -28,6 +27,7 @@ public:
 	int getHeight() { return stepHeight; }
 
 	void life2D();
+	void pseudoLife2D();
 
 	int getAlive2D(int x, int z);
 
@@ -44,6 +44,7 @@ private:
 
 	int randNum;
 	int count;
+	int oldCount;
 
 	int width_, height_, depth_, stepHeight;;
 };

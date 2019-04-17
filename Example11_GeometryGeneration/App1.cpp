@@ -145,6 +145,12 @@ void App1::gui()
 	}
 	else
 		step = false;
+
+	if (ImGui::Button("pseudo Life 2D step"))
+	{
+		caveGen->pseudoLife2D();
+		cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount(), width, depth, caveGen->getHeight());
+	}
 	ImGui::InputInt("Width", &width);
 	ImGui::InputInt("Height", &height);
 	ImGui::InputInt("Depth", &depth);

@@ -22,29 +22,12 @@ void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count, int wid
 	
 	InstanceType* instances = new InstanceType[instanceCount];
 
-	int index = 0;
-	int pos = 0;
-	it = 0;
-
-	for (int z = 0; z < depth; z++)
+	for (int i = 0; i < count; i++)
 	{
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				index = (z * depth + x);
-				index = (z * height * width) + (y*width) + x;
-				it++;
-				if (cellMap[index].active)
-				{
-					instances[pos].position = cellMap[index].position;
-					instances[pos].colour = XMFLOAT4(1.0f, 0.f, 0.0f, 1.0f);
-					pos++;
-				}
-			}
-
-		}
+		instances[i].position = cellMap[i].position;
+		instances[i].colour = XMFLOAT4(1.0f, 0.f, 0.0f, 1.0f);
 	}
+	
 
 	D3D11_BUFFER_DESC instanceBufferDesc = { sizeof(InstanceType)* instanceCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
 	instanceData = { instances ,0,0 };

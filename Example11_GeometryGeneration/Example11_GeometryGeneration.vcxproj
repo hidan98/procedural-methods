@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="App1.cpp" />
     <ClCompile Include="Cave.cpp" />
+    <ClCompile Include="Dungeon.cpp" />
     <ClCompile Include="GeometryShader.cpp" />
     <ClCompile Include="InstanceCube.cpp" />
     <ClCompile Include="InstanceShader.cpp" />
@@ -137,6 +138,7 @@
   <ItemGroup>
     <ClInclude Include="App1.h" />
     <ClInclude Include="Cave.h" />
+    <ClInclude Include="Dungeon.h" />
     <ClInclude Include="GeometryShader.h" />
     <ClInclude Include="InstanceCube.h" />
     <ClInclude Include="InstanceShader.h" />
