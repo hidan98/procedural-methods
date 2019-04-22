@@ -9,6 +9,8 @@
 #include "InstanceShader.h"
 #include"Cave.h"
 #include <thread>
+#include "Dungeon.h"
+#include "DungeonManager.h"
 
 class App1 : public BaseApplication
 {
@@ -31,6 +33,7 @@ private:
 	PointMesh* mesh;
 
 	InstanceCube* cube;
+	InstanceCube* bound;
 	InstanceShader* shader;
 	Cave* caveGen;
 
@@ -46,6 +49,13 @@ private:
 
 	std::thread* caveStep;
 	bool close;
+	Dungeon* dungeon;
+	DungeonManager* manager;
+
+	int camNum;
+	std::vector<Dungeon>* vec;
+
+
 };
 
 #endif

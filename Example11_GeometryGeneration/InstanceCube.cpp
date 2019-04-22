@@ -1,8 +1,6 @@
 #include "InstanceCube.h"
 #include "Cave.h"
 
-
-
 InstanceCube::InstanceCube(ID3D11Device* device)
 {
 	initBuffers(device);
@@ -13,7 +11,7 @@ InstanceCube::~InstanceCube()
 {
 	BaseMesh::~BaseMesh();
 }
-void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count, int width, int depth, int height)
+void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count)
 {
 	//initBuffers(device);
 	D3D11_SUBRESOURCE_DATA instanceData;
@@ -112,8 +110,6 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 	vertices[5].normal = XMFLOAT3(0.0f, 0.0f, -1.0f);
 	vertices[5].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[5] = 5;
-
-
 
 	//top face
 	vertices[6].position = XMFLOAT3(0.0f, 1.0f, 1.0f);

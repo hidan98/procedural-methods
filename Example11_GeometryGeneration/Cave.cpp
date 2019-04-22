@@ -47,25 +47,6 @@ void Cave::initializeMap(int width, int depth, int height, int chance)
 	
 	int index;
 
-	/*for (int x = 0; x < width_; x++)
-	{
-		for (int z = 0; z < depth_; z++)
-		{
-			index = x * width_ + z;
-
-			randNum = rand() % 100;
-			if (randNum < chance)
-			{
-				cellMap[index].active = true;
-				cellMap[index].position = XMFLOAT3(x, 0, z);
-				count++;
-			}
-			else
-			{
-				cellMap[index].active = false;
-			}
-		}
-	}*/
 	int temp = 0;
 	for (int z = 0; z < depth_; z++)
 	{
@@ -112,12 +93,10 @@ void Cave::initalize2DMap(int width, int depth, int chance)
 	height_ = 1;
 	stepHeight = 1;
 	cellMap = new cells[width_ * depth_ ];
-	
 
 	count = 0;
 
 	int index;
-
 
 	int temp = 0;
 	for (int z = 0; z < depth_; z++)
@@ -143,7 +122,6 @@ void Cave::initalize2DMap(int width, int depth, int chance)
 	}
 	stack = new cells[count];
 
-
 	int iterator = 0;
 	for (int z = 0; z < depth_; z++)
 	{
@@ -157,7 +135,6 @@ void Cave::initalize2DMap(int width, int depth, int chance)
 			}
 		}
 	}
-
 }
 
 void Cave::stepB17_18_19_S13_14_16_()
@@ -165,7 +142,6 @@ void Cave::stepB17_18_19_S13_14_16_()
 	newCellMap = new cells[width_* depth_ * height_];
 	count = 0;
 	int index = 0;
-
 
 	for (int z = 0; z < depth_; z++)
 	{
@@ -249,17 +225,17 @@ void Cave::stepB678_S345678()
 				}
 				else
 				{
-				if (aliveNbs > 5)
-				{
-					newCellMap[index].active = true;
-					newCellMap[index].position = XMFLOAT3(x, y, z);
-					count++;
-				}
-				else
-				{
-					newCellMap[index].active = false;
-					newCellMap[index].position = XMFLOAT3(x, y, z);
-				}
+					if (aliveNbs > 5)
+					{
+						newCellMap[index].active = true;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+						count++;
+					}
+					else
+					{
+						newCellMap[index].active = false;
+						newCellMap[index].position = XMFLOAT3(x, y, z);
+					}
 				}
 			}
 		}
@@ -338,7 +314,6 @@ void Cave::life2D()
 
 	for (int z = 0; z < depth_; z++)
 	{
-		
 		for (int x = 0; x < width_; x++)
 		{
 			index = (z * width_) + x;
@@ -484,7 +459,6 @@ void Cave::pseudoLife2D()
 		}
 	}
 
-
 	stack = new cells[count];
 	memcpy(stack, newStack, sizeof(cells) * count);
 	delete[] newStack;
@@ -523,9 +497,7 @@ int Cave::getAlive(int x, int y, int z)
 			}
 		}
 	}
-	
 	return alive;
-
 }
 
 int Cave::getAlive2D(int x, int z)

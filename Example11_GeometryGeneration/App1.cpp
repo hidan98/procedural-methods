@@ -21,8 +21,18 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	cube = new InstanceCube(renderer->getDevice());
 	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
+	dungeon = new Dungeon();
 
+	bound = new InstanceCube(renderer->getDevice());
+	
+	//dungeon->bounds(10, 10);
+	
+	manager = new DungeonManager;
+	manager->setup(1);
+	bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	close = false;
+
+	vec = manager->getDungeon();
 }
 
 
@@ -48,7 +58,7 @@ void App1::Cavestep()
 	caveGen->life2D();
 	//caveGen->step(death, alive, livelim);
 	
-	cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount(), width, depth, caveGen->getHeight());
+	cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount());
 	//caveStep->join();
 	close = true;
 }
@@ -57,11 +67,11 @@ bool App1::frame()
 {
 	bool result;
 
-	/*if (close)
+	if (close)
 	{
 		caveStep->join();
 		close = false;
-	}*/
+	}
 
 	if (regen)
 	{
@@ -72,13 +82,13 @@ bool App1::frame()
 
 	if (step)
 	{
-		//caveStep = new std::thread([&] {Cavestep(); });
-		Cavestep();
+		caveStep = new std::thread([&] {Cavestep(); });
+		//Cavestep();
 		
 		step = false;
 	}
 
-	result = BaseApplication::frame();
+	result = BaseApplication::frame(); 
 	if (!result)
 	{
 		return false;
@@ -112,6 +122,10 @@ bool App1::render()
 	cube->sendData(renderer->getDeviceContext());
 	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
 	shader->render(renderer->getDeviceContext(), cube->getIndexCount(), cube->getInstanceCount());
+
+	bound->sendData(renderer->getDeviceContext());
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
+	shader->render(renderer->getDeviceContext(), bound->getIndexCount(), bound->getInstanceCount());
 
 	// Render GUI
 	gui();
@@ -149,15 +163,25 @@ void App1::gui()
 	if (ImGui::Button("pseudo Life 2D step"))
 	{
 		caveGen->pseudoLife2D();
-		cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount(), width, depth, caveGen->getHeight());
+		cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount());
 	}
 	ImGui::InputInt("Width", &width);
-	ImGui::InputInt("Height", &height);
 	ImGui::InputInt("Depth", &depth);
 	ImGui::InputInt("Chance", &chance);
-	ImGui::InputInt("lonely limit", &death);
-	ImGui::InputInt("overPop limit", &alive);
-	ImGui::InputInt("Live again lim", &livelim);
+	ImGui::Text("Failed %i", manager->getFailCount());
+	
+	if (ImGui::InputInt("Camera change", &camNum))
+	{
+		XMFLOAT3 temp = manager->getCenter(camNum);
+		camera->setPosition(temp.x, 10, temp.z);
+	}
+
+	if (ImGui::Button("Regen dungeon"))
+	{
+		manager->setup(20);
+		bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
+	}
+
 
 
 	// Render UI
