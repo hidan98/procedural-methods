@@ -11,6 +11,7 @@
 #include <thread>
 #include "Dungeon.h"
 #include "DungeonManager.h"
+#include "LinkedList.h"
 
 class App1 : public BaseApplication
 {
@@ -54,7 +55,6 @@ private:
 
 	int camNum;
 	std::vector<Dungeon>* vec;
-
 
 };
 

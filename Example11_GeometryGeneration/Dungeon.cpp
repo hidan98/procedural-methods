@@ -4,7 +4,8 @@
 
 Dungeon::Dungeon()
 {
-	
+	minWidth = 20;
+	minDepth = 20;
 }
 
 
@@ -23,7 +24,17 @@ void Dungeon::setup(int xPos, int yPos, int width, int depth)
 	width_ = width;
 	depth_ = depth;
 
-	centre = XMFLOAT3(floor((startX + endX) / 2), 0, floor((startX + endX) / 2));
+	if ((depth_ * 2) < minDepth)
+	{
+		canSplit = false;
+
+	}
+	if ((width_ * 2) < minWidth)
+	{
+		canSplit = false;
+	}
+
+	centre = XMFLOAT3(floor((startX + endX) / 2), 0, floor((startY + endY) / 2));
 }
 //will need to double check this
 bool Dungeon::intersect(Dungeon* other)

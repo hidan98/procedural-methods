@@ -62,6 +62,9 @@
     <ClInclude Include="DungeonManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LinkedList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="triangle_gs.hlsl">

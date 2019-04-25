@@ -18,7 +18,11 @@ private:
 	
 	int width_, depth_, startX, endX, startY, endY;
 	XMFLOAT3 centre;
+	int generation;
+	bool canSplit;
+	int minWidth, minDepth;
 	friend class DungeonManager;
+
 	
 
 };

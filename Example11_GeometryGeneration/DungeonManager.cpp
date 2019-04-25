@@ -12,6 +12,8 @@ DungeonManager::DungeonManager()
 	maxWidth = 100; 
 	maxDepth = 100;
 	done = false;
+	dungeons = new std::vector<Dungeon>;
+	gen = 1;
 }
 
 
@@ -34,7 +36,83 @@ void DungeonManager::deleteCave()
 	}
 	
 }
+void DungeonManager::setup(int width, int depth, int splits, XMFLOAT3 start)
+{
+	root = new Dungeon;
+	root->setup(start.x, start.z, width, depth);
+	root->generation = 1;
+	stack.push(*root);
+	split(root);
+	/*dungeons->push_back(*root);
+	size = (width * 2) + (depth * 2);*/
+	setBounds();
+/*
+		int i = 0;
+		while (i<3)
+		{
+			if (stack.top().canSplit)
+			{
+				split(&stack.top());
+				stack.pop();
+				i++;
+			}
+			else
+			{
+				stack.pop();
+			}
+		}
+	
+		
+		
+	
+	setBounds();*/
+	/*split(root);
+	split(newOne);
+	split(newTwo);*/
+}
+void DungeonManager::split(const Dungeon* dun)
+{
+	//size = 0;
+	int direction = rand() % 2;
+	//vertical
+	if (direction == 0)
+	{
+		Dungeon newOne;
+		int splitAt = rand() % dun->endX + dun->startX;
+		//splitAt++;
+		
+		newOne.setup(dun->startX, dun->startY, splitAt, dun->depth_);
+		size += (splitAt * 2) + (dun->depth_  * 2);
 
+
+		Dungeon newTwo;
+		newTwo.setup(splitAt, dun->startY, dun->width_ - splitAt +1, dun->depth_);
+		size += ((dun->width_ - splitAt) * 2) + ((dun->depth_ ) * 2);
+		//dungeons = new std::vector<Dungeon>;
+		dungeons->push_back(newOne);
+		dungeons->push_back(newTwo);
+		stack.push(newOne);
+		stack.push(newTwo);
+	}
+	else
+	{
+		int splitAt = rand() % dun->endY + dun->startY;
+		//splitAt++;
+		Dungeon newOne;
+		newOne.setup(dun->startX, dun->startY, dun->width_, splitAt);
+		size += (splitAt * 2) + ((dun->depth_ ) * 2);
+
+
+		Dungeon newTwo;
+		newTwo.setup(dun->startX, splitAt , dun->width_ , dun->depth_ - splitAt);
+		size += ((dun->width_ - splitAt) * 2) + ((dun->depth_ ) * 2);
+		//dungeons = new std::vector<Dungeon>;
+		dungeons->push_back(newOne);
+		dungeons->push_back(newTwo);
+		stack.push(newOne);
+		stack.push(newTwo);
+	}
+}
 void DungeonManager::setup(int number)
 {	
 	while (!done)
@@ -55,8 +133,8 @@ void DungeonManager::setup(int number)
 			int width = minWidth + rand() % (maxWidth - minWidth + 1);
 			int depth = minDepth + rand() % (maxDepth - minDepth + 1);
 
-			int startX = 1 + rand() % (200 - width - 1);
-			int startY = 1 + rand() % (200 - depth - 1);
+			int startX = 1 + rand() % (400 - width - 1);
+			int startY = 1 + rand() % (400 - depth - 1);
 
 			Dungeon temp;
 			temp.setup(startX, startY, width, depth);

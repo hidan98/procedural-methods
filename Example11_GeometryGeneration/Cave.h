@@ -47,5 +47,6 @@ private:
 	int oldCount;
 
 	int width_, height_, depth_, stepHeight;;
+	std::vector<cells> temp;
 };
 

@@ -144,6 +144,7 @@
     <ClInclude Include="GeometryShader.h" />
     <ClInclude Include="InstanceCube.h" />
     <ClInclude Include="InstanceShader.h" />
+    <ClInclude Include="LinkedList.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="instance_PS.hlsl">

@@ -28,11 +28,12 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	//dungeon->bounds(10, 10);
 	
 	manager = new DungeonManager;
-	manager->setup(1);
+	manager->setup(10, 10, 2);
 	bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	close = false;
 
 	vec = manager->getDungeon();
+
 }
 
 
@@ -189,4 +190,3 @@ void App1::gui()
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 }
-
