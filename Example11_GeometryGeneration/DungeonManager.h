@@ -34,6 +34,8 @@ private:
 	Dungeon* root;
 
 	std::stack<Dungeon> stack;
+	std::stack<Dungeon> currentGen;
+	std::stack<Dungeon> nextGen;
 	int gen;
 
 	bool done;

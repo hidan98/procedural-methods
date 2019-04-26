@@ -28,7 +28,7 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	//dungeon->bounds(10, 10);
 	
 	manager = new DungeonManager;
-	manager->setup(10, 10, 2);
+	manager->setup(100, 100, 2);
 	bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	close = false;
 
@@ -179,7 +179,7 @@ void App1::gui()
 
 	if (ImGui::Button("Regen dungeon"))
 	{
-		manager->setup(20);
+		manager->setup(100, 100, 4);
 		bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	}
 

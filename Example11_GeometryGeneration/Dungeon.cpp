@@ -17,10 +17,10 @@ Dungeon::~Dungeon()
 void Dungeon::setup(int xPos, int yPos, int width, int depth)
 {
 	startX = xPos;
-	endX = xPos + width;
+	endX = xPos + width -1;
 
 	startY = yPos;
-	endY = yPos + depth;
+	endY = yPos + depth -1;
 	width_ = width;
 	depth_ = depth;
 
