@@ -21,7 +21,6 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	cube = new InstanceCube(renderer->getDevice());
 	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
-	dungeon = new Dungeon();
 
 	bound = new InstanceCube(renderer->getDevice());
 	
@@ -32,7 +31,6 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	close = false;
 
-	vec = manager->getDungeon();
 
 }
 
@@ -179,7 +177,7 @@ void App1::gui()
 
 	if (ImGui::Button("Regen dungeon"))
 	{
-		manager->setup(100, 100, 4);
+		manager->setup(200, 200, 5);
 		bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	}
 

@@ -12,16 +12,16 @@ DungeonManager::DungeonManager()
 	maxWidth = 100; 
 	maxDepth = 100;
 	done = false;
-	dungeons = new std::vector<Dungeon>;
+	//dungeons = new std::vector<Dungeon>;
 	gen = 1;
 }
 
 
 DungeonManager::~DungeonManager()
 {
-	dungeons->clear();
+	/*dungeons->clear();
 	delete dungeons;
-	dungeons = nullptr;
+	dungeons = nullptr;*/
 }
 
 void DungeonManager::deleteCave()
@@ -30,112 +30,180 @@ void DungeonManager::deleteCave()
 	{
 		delete[] cave;
 		cave = nullptr;
-		dungeons->clear();
+		/*dungeons->clear();
 		delete dungeons;
-		dungeons = nullptr;
+		dungeons = nullptr;*/
 		size = 0;
 	}
+	bool done = false;
+	delete root; 
+	root = nullptr;
+	dungeons.clear();
+	final.clear();
 	
+}
+
+void DungeonManager::caveSetup()
+{
+	for (auto dun : final)
+	{
+
+	}
 }
 void DungeonManager::setup(int width, int depth, int splits, XMFLOAT3 start)
 {
 	deleteCave();
-	dungeons = new std::vector<Dungeon>;
-	root = new Dungeon;
+
+	root = new Dungeon(nullptr);
 	root->setup(start.x, start.z, width, depth);
-	root->generation = 1;
-	currentGen.push(*root);
-	//stack.push(*root);
-	
+	root->generation = 0;
 
-	for (int i = 0; i < splits; i++)
+	dungeons.push_back(root);
+
+	bool done = false;
+	while (!done)
 	{
-		while (!currentGen.empty())
+		for(int i =0; i< dungeons.size(); i++)
 		{
-			split(&currentGen.top());
-			currentGen.pop();
-		}
-		currentGen = nextGen;
-		while (!nextGen.empty())
-		{
-			nextGen.pop();
-		}
-	}
-	while (!currentGen.empty())
-	{
-		dungeons->push_back(currentGen.top());
-		currentGen.pop();
-	}
-	//dungeons->push_back(*root);
-	//size = (width * 2) + (depth * 2);*/
-	setBounds();
-/*
-		int i = 0;
-		while (i<3)
-		{
-			if (stack.top().canSplit)
+			if (dungeons[i]->generation < splits + 1)
 			{
-				split(&stack.top());
-				stack.pop();
-				i++;
+				if (dungeons[i]->left == nullptr && dungeons[i]->right == nullptr)
+				{
+					split(dungeons[i], dungeons[i]->generation);
+				}
 			}
-			else
-			{
-				stack.pop();
-			}
+
 		}
-	
-		
-		
-	
-	setBounds();*/
-	/*split(root);
-	split(newOne);
-	split(newTwo);*/
-	delete root;
-	root = nullptr;
+
+		done = true;
+	}
+
+	setBounds(splits + 1);
+
 }
-void DungeonManager::split(const Dungeon* dun)
-{
-	//size = 0;
-	int direction = rand() % 2;
-	//vertical
-	if (direction == 0)
-	{
-		Dungeon newOne;
-		int splitAt = rand() % dun->endX + dun->startX;
-		//splitAt++;
-		int width = splitAt - dun->startX + 1;
-		newOne.setup(dun->startX, dun->startY, width, dun->depth_);
-		size += (width * 2) + (dun->depth_ * 2) - 4;
-		nextGen.push(newOne);
 
-		Dungeon newTwo;
-		width = dun->width_ - width;
-		newTwo.setup(splitAt + 1, dun->startY, width, dun->depth_);
-		nextGen.push(newTwo);
-		size += (width * 2) + (dun->depth_ * 2) - 4;
+Dungeon* DungeonManager::getDungeon_(Dungeon* dun)
+{
+	Dungeon* temp;
+	if (dun->left)
+	{
+		temp = getDungeon_(dun->left);
+	}
+	else if(dun->right)
+	{
+		temp = getDungeon_(dun->right);
 	}
 	else
 	{
-		Dungeon newOne;
-		int splitAt = rand() % dun->endY + dun->startY;
-		//splitAt++;
-		int depth = splitAt - dun->startY + 1;
-		newOne.setup(dun->startX, dun->startY, dun->width_, depth);
-		size += (dun->width_ * 2) + (depth * 2) - 4;
-		nextGen.push(newOne);
+		temp = dun->parent;
+	}
+	return temp;
+}
+void DungeonManager::split(Dungeon* dun, int genNum)
+{
+	//size = 0;
+	int direction = rand() % 2;
 
-		Dungeon newTwo;
-		depth = dun->depth_ - depth;
-		newTwo.setup(dun->startX, splitAt + 1, dun->width_, depth);
-		nextGen.push(newTwo);
-		size += (dun->width_ * 2) + (depth * 2) - 4;
+	if (dun->width_ < 80)
+	{
+		if (dun->depth_ >= 80)
+		{
+			direction = 1;
+		}
+		else
+		{
+			Dungeon* temp = dun;
+			temp->generation = genNum + 1;
+			dungeons.push_back(temp);
+			return;
+		}
+	}
+	else if (dun->depth_ < 80)
+	{
+		if (dun->width_ >= 80)
+		{
+			direction = 0;
+		}
+		else
+		{
+			Dungeon* temp = dun;
+			temp->generation = genNum + 1;
+			dungeons.push_back(temp);
+			return;
+		}
+	}
+	//vertical
+	bool done = false;
+	if (direction == 0)
+	{
+		Dungeon* newOne = new Dungeon(dun);
+		Dungeon* newTwo = new Dungeon(dun);
+		while (!done)
+		{			
+			int splitAt = rand() % (dun->endX - dun->startX + 1) + dun->startX;
+			//splitAt++;
+			int width = splitAt - dun->startX + 1;
+			if (width >= 40)
+			{
+				newOne->setup(dun->startX, dun->startY, width, dun->depth_);
+				width = dun->width_ - width;
+				if (width >= 40)
+				{
+					newTwo->setup(splitAt + 1, dun->startY, width, dun->depth_);
+					done = true;
+				}
+			}
+		}
+
+		newOne->generation = genNum + 1;
+
+
+		dun->left = newOne;
+		dun->right = newTwo;
+
+		dungeons.push_back(newOne);
+		dungeons.push_back(newTwo);
+		newTwo->generation = genNum + 1;
+
+	}
+	else
+	{
+		Dungeon* newOne = new Dungeon(dun);
+		Dungeon* newTwo = new Dungeon(dun);
+		
+		while (!done)
+		{
+			int splitAt = rand() % (dun->endY - dun->startY + 1) + dun->startY;
+			//splitAt++;
+			int depth = splitAt - dun->startY + 1;
+			if (depth >= 40)
+			{
+				newOne->setup(dun->startX, dun->startY, dun->width_, depth);
+				depth = dun->depth_ - depth;
+				if (depth >= 40)
+				{
+					newTwo->setup(dun->startX, splitAt + 1, dun->width_, depth);
+					done = true;
+				}
+			}
+		}
+		
+
+		newOne->generation = genNum + 1;
+		
+
+		dun->left = newOne;
+		dun->right = newTwo;
+		newTwo->generation = genNum + 1;
+		dungeons.push_back(newOne);
+		dungeons.push_back(newTwo);
+
+
 	}
 }
 void DungeonManager::setup(int number)
 {	
-	while (!done)
+	/*while (!done)
 	{
 		deleteCave();
 		dungeons = new std::vector<Dungeon>;
@@ -184,35 +252,44 @@ void DungeonManager::setup(int number)
 
 	
 	setBounds();
-	done = false;
+	done = false;*/
 }
-void DungeonManager::setBounds()
+void DungeonManager::setBounds(int genCheck)
 {
-
+	size = 0;
+	for (int i = 0; i < dungeons.size(); i++)
+	{
+		if (dungeons[i]->generation == genCheck)
+		{
+			final.push_back(dungeons[i]);
+			size += (final.back()->width_ * 2) + (final.back()->depth_ * 2) - 4;
+		}
+	}
+	
 	cave = new cells[size];
 	count = 0;
-	for (auto dungeon : *dungeons)
+	for (auto dungeon : final)
 	{
-		int tempZ = dungeon.startY;
+		int tempZ = dungeon->startY;
 		for (int k = 0; k < 2; k++)
 		{
-			for (int i = dungeon.startX; i < dungeon.startX + dungeon.width_; i++)
+			for (int i = dungeon->startX; i < dungeon->startX + dungeon->width_; i++)
 			{
 				cave[count].position = XMFLOAT3(i, 0, tempZ);
 				count++;
 			}
-			tempZ = dungeon.endY;
+			tempZ = dungeon->endY;
 		}
 		
-		int tempX = dungeon.startX;
+		int tempX = dungeon->startX;
 		for (int i = 0; i < 2; i++)
 		{
-			for (int k = dungeon.startY +1; k < dungeon.endY; k++)
+			for (int k = dungeon->startY +1; k < dungeon->endY; k++)
 			{
 				cave[count].position = XMFLOAT3(tempX, 0, k);
 				count++;
 			}
-			tempX = dungeon.endX;
+			tempX = dungeon->endX;
 		}
 		
 	}
@@ -221,5 +298,5 @@ void DungeonManager::setBounds()
 XMFLOAT3 DungeonManager::getCenter(int num)
 {
 	//XMFLOAT3 = dungeons->at(num);
-	return dungeons->at(num).centre;
+	return dungeons.at(num)->centre;//.at(num).centre;
 }

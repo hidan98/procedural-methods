@@ -2,20 +2,38 @@
 #include "Cave.h"
 #include <math.h>
 
-Dungeon::Dungeon()
+Dungeon::Dungeon(Dungeon* Parent) : parent(Parent)
 {
 	minWidth = 20;
 	minDepth = 20;
+	left = nullptr;
+	right = nullptr;
 }
 
 
 Dungeon::~Dungeon()
 {
+	cleanUp();
 	
+}
+
+void Dungeon::cleanUp()
+{
+	if (left)
+	{
+		delete left;
+		left = nullptr;
+	}
+	if (right)
+	{
+		delete right;
+		right = nullptr;
+	}
 }
 
 void Dungeon::setup(int xPos, int yPos, int width, int depth)
 {
+
 	startX = xPos;
 	endX = xPos + width -1;
 
