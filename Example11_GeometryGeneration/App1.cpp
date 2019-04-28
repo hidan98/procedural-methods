@@ -16,10 +16,8 @@ void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeigh
 	height = 1;
 	textureMgr->loadTexture("brick", L"../res/bunny.png");
 
-	caveGen = new Cave();
-	caveGen->initalize2DMap(width, depth, 100);
 	cube = new InstanceCube(renderer->getDevice());
-	cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
+	/*cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);*/
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
 	bound = new InstanceCube(renderer->getDevice());
@@ -54,10 +52,10 @@ App1::~App1()
 
 void App1::Cavestep()
 {
-	caveGen->life2D();
+	manager->caveStep();// ->life2D();
 	//caveGen->step(death, alive, livelim);
 	
-	cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount());
+	bound->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
 	//caveStep->join();
 	close = true;
 }
@@ -72,12 +70,6 @@ bool App1::frame()
 		close = false;
 	}
 
-	if (regen)
-	{
-		caveGen->initalize2DMap(width, depth, chance);
-		cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);
-		regen = false;
-	}
 
 	if (step)
 	{
@@ -123,7 +115,7 @@ bool App1::render()
 	shader->render(renderer->getDeviceContext(), cube->getIndexCount(), cube->getInstanceCount());
 
 	bound->sendData(renderer->getDeviceContext());
-	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, bound->getIndexCount(), bound->getInstanceCount(), textureMgr->getTexture("brick"));
 	shader->render(renderer->getDeviceContext(), bound->getIndexCount(), bound->getInstanceCount());
 
 	// Render GUI
@@ -178,7 +170,8 @@ void App1::gui()
 	if (ImGui::Button("Regen dungeon"))
 	{
 		manager->setup(200, 200, 5);
-		bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
+		bound->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
+		cube->init(renderer->getDevice(), manager->getCave(), manager->getCount());
 	}
 
 

@@ -11,7 +11,6 @@ DungeonManager::DungeonManager()
 	minDepth = 20;
 	maxWidth = 100; 
 	maxDepth = 100;
-	done = false;
 	//dungeons = new std::vector<Dungeon>;
 	gen = 1;
 }
@@ -19,9 +18,7 @@ DungeonManager::DungeonManager()
 
 DungeonManager::~DungeonManager()
 {
-	/*dungeons->clear();
-	delete dungeons;
-	dungeons = nullptr;*/
+	deleteCave();
 }
 
 void DungeonManager::deleteCave()
@@ -35,10 +32,25 @@ void DungeonManager::deleteCave()
 		dungeons = nullptr;*/
 		size = 0;
 	}
+
+	if (allCaves)
+	{
+		delete[] allCaves;
+		allCaves = nullptr;
+		for (auto cave : caves)
+		{
+			delete cave;
+		}
+		caves.clear();
+		caveSize = 0;
+
+	}
 	bool done = false;
 	delete root; 
 	root = nullptr;
 	dungeons.clear();
+
+	
 	final.clear();
 	
 }
@@ -47,8 +59,73 @@ void DungeonManager::caveSetup()
 {
 	for (auto dun : final)
 	{
+		bool done = false;
+		int startX;
+		int width;
+		while (!done)
+		{
+			startX = random(dun->startX, dun->endX);
+			width = random(30, dun->width_ - 10);
+			int end = startX + width - 1;
+			if (end < dun->endX)
+			{
+				done = true;
+			}
+		}
+		int startY;
+		int depth;
+		done = false;
+		while (!done)
+		{
+			startY = random(dun->startY, dun->endY);
+			depth = random(30, dun->depth_ - 10);
+			int end = startY + depth - 1;
+			if (end < dun->endY)
+			{
+				done = true;
+			}
+		}
 
+		caves.push_back(new Cave);		
+		
+		caves.back()->initalize2DMap(startX, startY, width, depth, 5);
+		caveSize += caves.back()->getCount();
 	}
+	allCaves = new cells[caveSize];
+	int it = 0;
+	for (auto cave : caves)
+	{
+		for (int i = 0; i < cave->getCount(); i++)
+		{
+			allCaves[it] = cave->getStack()[i];
+			it++;
+		}
+	}
+
+}
+
+void DungeonManager::caveStep()
+{
+	caveSize = 0;
+	delete[] allCaves;
+	allCaves = nullptr;
+
+	for (auto cave : caves)
+	{
+		cave->life2D();
+		caveSize += cave->getCount();
+	}
+	int it = 0;
+	allCaves = new cells[caveSize];
+	for (auto cave : caves)
+	{
+		for (int i = 0; i < cave->getCount(); i++)
+		{
+			allCaves[it] = cave->getStack()[i];
+			it++;
+		}
+	}
+
 }
 void DungeonManager::setup(int width, int depth, int splits, XMFLOAT3 start)
 {
@@ -79,7 +156,7 @@ void DungeonManager::setup(int width, int depth, int splits, XMFLOAT3 start)
 	}
 
 	setBounds(splits + 1);
-
+	caveSetup();
 }
 
 Dungeon* DungeonManager::getDungeon_(Dungeon* dun)
@@ -112,7 +189,8 @@ void DungeonManager::split(Dungeon* dun, int genNum)
 		}
 		else
 		{
-			Dungeon* temp = dun;
+
+			Dungeon* temp = new Dungeon(*dun);
 			temp->generation = genNum + 1;
 			dungeons.push_back(temp);
 			return;
@@ -126,7 +204,7 @@ void DungeonManager::split(Dungeon* dun, int genNum)
 		}
 		else
 		{
-			Dungeon* temp = dun;
+			Dungeon* temp = new Dungeon(*dun);
 			temp->generation = genNum + 1;
 			dungeons.push_back(temp);
 			return;
@@ -273,7 +351,7 @@ void DungeonManager::setBounds(int genCheck)
 		int tempZ = dungeon->startY;
 		for (int k = 0; k < 2; k++)
 		{
-			for (int i = dungeon->startX; i < dungeon->startX + dungeon->width_; i++)
+			for (int i = dungeon->startX; i < dungeon->endX; i++)
 			{
 				cave[count].position = XMFLOAT3(i, 0, tempZ);
 				count++;
@@ -299,4 +377,9 @@ XMFLOAT3 DungeonManager::getCenter(int num)
 {
 	//XMFLOAT3 = dungeons->at(num);
 	return dungeons.at(num)->centre;//.at(num).centre;
+}
+
+int DungeonManager::random(int low, int high)
+{
+	return rand() % (high - low + 1) + low;
 }

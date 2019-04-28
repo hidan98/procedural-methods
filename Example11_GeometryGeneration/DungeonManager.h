@@ -18,12 +18,17 @@ public:
 	XMFLOAT3 getCenter(int num);
 	int getFailCount() { return failCount; }
 
+	cells* getAllCave() { return allCaves; }
+	int getCaveSize() { return caveSize; }
+
 	void caveSetup();
+	void caveStep();
 
 private:
 	void setBounds(int gen);
 	void deleteCave();
 	Dungeon* getDungeon_(Dungeon* dun);
+	int random(int low, int high);
 
 	void split(Dungeon* dun, int genNum);
 	std::vector<Dungeon*> dungeons;
@@ -37,9 +42,10 @@ private:
 	Dungeon* root;
 
 	std::vector<Cave*> caves;
-
+	cells* allCaves;
 	int gen;
 
-	bool done;
+	int caveSize;
+
 };
 

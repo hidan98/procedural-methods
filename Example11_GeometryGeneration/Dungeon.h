@@ -26,7 +26,7 @@ private:
 	Dungeon* left;
 	Dungeon* right;
 	Dungeon* parent;
-	std::vector<int> splitHistory;
+
 	friend class DungeonManager;
 
 	

@@ -16,7 +16,7 @@ public:
 	~Cave();
 
 	void initializeMap(int width, int depth, int height, int chance);
-	void initalize2DMap(int width, int depth, int chance);
+	void initalize2DMap(int startX, int startY, int width, int depth, int chance);
 	cells* getCellMap() { return cellMap; }
 	void deleteMap();
 	void step(int dethLimit, int aliveLimit, int liveLim);
@@ -45,6 +45,9 @@ private:
 	int randNum;
 	int count;
 	int oldCount;
+
+	int startX_, startY_;
+	int endX, endY;
 
 	int width_, height_, depth_, stepHeight;;
 	std::vector<cells> temp;
