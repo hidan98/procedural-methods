@@ -15,13 +15,10 @@ public:
 	Cave();
 	~Cave();
 
-	void initializeMap(int width, int depth, int height, int chance);
 	void initalize2DMap(int startX, int startY, int width, int depth, int chance);
+	//return top layer - no longer required as we get the stack array now
 	cells* getCellMap() { return cellMap; }
-	void deleteMap();
-	void step(int dethLimit, int aliveLimit, int liveLim);
-	void stepB678_S345678();
-	void stepB17_18_19_S13_14_16_();
+		
 	int getCount(){return count;}
 	cells* getStack() { return stack; }
 	int getHeight() { return stepHeight; }
@@ -30,26 +27,26 @@ public:
 	void pseudoLife2D();
 
 	int getAlive2D(int x, int z);
-
+	int getStartX() { return startX_; }
+	int getStartY() { return startY_; }
+	int getWidth() { return width_; }
+	int getDepth() { return depth_; }
 
 private:
-	int getAlive(int x, int y, int z);
+	void deleteMap();
 
 	cells* newCellMap;
-
 	cells* cellMap;
 	cells* stack;
-	cells* stackCopy;
 	cells* newStack;
 
-	int randNum;
 	int count;
 	int oldCount;
 
 	int startX_, startY_;
 	int endX, endY;
 
-	int width_, height_, depth_, stepHeight;;
-	std::vector<cells> temp;
+	int width_, depth_, stepHeight;
+
 };
 

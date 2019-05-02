@@ -27,6 +27,7 @@ cbuffer MatrixBuffer : register(b0)
 OutputType main(InputType input)
 {
 	OutputType output;
+	//need to convert the positon using the instanced version
 	float4 pos = input.position;
 	pos.w = 1.0f;
 

@@ -1,35 +1,49 @@
 // Lab1.cpp
 // Lab 1 example, simple coloured triangle mesh
 #include "App1.h"
+#include <stdlib.h>
+#include <time.h>
 
 App1::App1()
 {
-
+	srand(time(NULL));
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
 {
 	// Call super/parent init function (required!)
 	BaseApplication::init(hinstance, hwnd, screenWidth, screenHeight, in, VSYNC, FULL_SCREEN);
-	width = 1;
-	depth = 1; 
-	height = 1;
-	textureMgr->loadTexture("brick", L"../res/bunny.png");
+	width = 100;
+	depth = 100; 
 
-	cube = new InstanceCube(renderer->getDevice());
-	/*cube->Init2D(renderer->getDevice(), caveGen->getCellMap(), caveGen->getCount(), width, depth);*/
 	shader = new InstanceShader(renderer->getDevice(), hwnd);
 
-	bound = new InstanceCube(renderer->getDevice());
-	
-	//dungeon->bounds(10, 10);
-	
+
+	//generate 16 random points
+	for (int i = 0; i < 16; i++)
+	{
+		//geneartes between 0 and 100 and then devides by 100 so its between 0 and 1
+		int tempX = rand() % (100 - 0 + 1) + 0;
+		float x = (float)tempX / 100.f;
+
+		int tempY = rand() % (100 - 0 + 1) + 0;
+		float y = (float)tempY / 100.f;
+		positions[i] = XMFLOAT2(x, y);
+	}
+	timeCollect = 0;
+	first = false;
+
 	manager = new DungeonManager;
-	manager->setup(100, 100, 2);
-	bound->init(renderer->getDevice(), manager->getCave(), manager->getCount());
+	manager->setup(100, 100, 2, chance);
+	bound = new InstanceCube(renderer->getDevice());
+	bound->init(renderer->getDevice(), manager->getBounds(), manager->getCount());
+
+	cave = new InstanceCube(renderer->getDevice());
+	cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
 	close = false;
 
-
+	path = new InstanceCube(renderer->getDevice());
+	path->init(renderer->getDevice(), manager->getAllPath(), manager->getPathSize());
 }
 
 
@@ -39,44 +53,54 @@ App1::~App1()
 	BaseApplication::~BaseApplication();
 
 	// Release the Direct3D object.
+	
 
-	delete caveGen;
-	caveGen = nullptr;
+	if (shader)
+	{
+		delete shader;
+		shader = nullptr;
+	}	
 
-	delete cube;
-	cube = nullptr;
-
-	delete shader;
-	shader = nullptr;
+	if (cave)
+	{
+		delete cave;
+		cave = nullptr;
+	}
+	if (bound)
+	{
+		delete bound;
+		bound = nullptr;
+	}
+	if (path) {
+		delete path;
+		path = nullptr;
+	}
 }
 
-void App1::Cavestep()
+void App1::lifeStep()
 {
-	manager->caveStep();// ->life2D();
-	//caveGen->step(death, alive, livelim);
-	
-	bound->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
-	//caveStep->join();
+	//generates new level of cave using life rulls and resets buffer 
+	manager->lifeStep();
+	cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
+	close = true;
+}
+void App1::pseudoLifeStep()
+{
+	//generates new level of cave using pseudoLife rulls and resets buffer 
+	manager->pseudoLifestep();
+	cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
 	close = true;
 }
 
 bool App1::frame()
 {
 	bool result;
-
+	
+	//catches the thread and closes it
 	if (close)
 	{
 		caveStep->join();
 		close = false;
-	}
-
-
-	if (step)
-	{
-		caveStep = new std::thread([&] {Cavestep(); });
-		//Cavestep();
-		
-		step = false;
 	}
 
 	result = BaseApplication::frame(); 
@@ -108,15 +132,20 @@ bool App1::render()
 	XMMATRIX viewMatrix = camera->getViewMatrix();
 	XMMATRIX projectionMatrix = renderer->getProjectionMatrix();
 
-	//worldMatrix = XMMatrixScaling(0.10f, 0.10f, 0.100f);
-	// Send geometry data, set shader parameters, render object with shader
-	cube->sendData(renderer->getDeviceContext());
-	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cube->getIndexCount(), cube->getInstanceCount(), textureMgr->getTexture("brick"));
-	shader->render(renderer->getDeviceContext(), cube->getIndexCount(), cube->getInstanceCount());
+	//render all caves
+	cave->sendData(renderer->getDeviceContext());
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, cave->getIndexCount(), cave->getInstanceCount(), textureMgr->getTexture("brick"), positions, timeCollect);
+	shader->render(renderer->getDeviceContext(), cave->getIndexCount(), cave->getInstanceCount());
 
+	//render dungeon bounds
 	bound->sendData(renderer->getDeviceContext());
-	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, bound->getIndexCount(), bound->getInstanceCount(), textureMgr->getTexture("brick"));
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, bound->getIndexCount(), bound->getInstanceCount(), textureMgr->getTexture("brick"), positions, timeCollect);
 	shader->render(renderer->getDeviceContext(), bound->getIndexCount(), bound->getInstanceCount());
+
+	//render path
+	path->sendData(renderer->getDeviceContext());
+	shader->setShderParameters(renderer->getDeviceContext(), worldMatrix, viewMatrix, projectionMatrix, path->getIndexCount(), path->getInstanceCount(), textureMgr->getTexture("brick"), positions, timeCollect);
+	shader->render(renderer->getDeviceContext(), path->getIndexCount(), path->getInstanceCount());
 
 	// Render GUI
 	gui();
@@ -137,41 +166,29 @@ void App1::gui()
 	// Build UI
 	ImGui::Text("FPS: %.2f", timer->getFPS());
 	ImGui::Checkbox("Wireframe mode", &wireframeToggle);
-	if (ImGui::Button("Test"))
-	{
-		regen = true;
-	}
-	else
-		regen = false;
-
-	if (ImGui::Button("Step"))
-	{
-		step = true;
-	}
-	else
-		step = false;
-
-	if (ImGui::Button("pseudo Life 2D step"))
-	{
-		caveGen->pseudoLife2D();
-		cube->init(renderer->getDevice(), caveGen->getStack(), caveGen->getCount());
-	}
+	
+	//dungeon spesificatins
 	ImGui::InputInt("Width", &width);
 	ImGui::InputInt("Depth", &depth);
 	ImGui::InputInt("Chance", &chance);
-	ImGui::Text("Failed %i", manager->getFailCount());
+	ImGui::InputInt("Splis", &splits);
 	
-	if (ImGui::InputInt("Camera change", &camNum))
-	{
-		XMFLOAT3 temp = manager->getCenter(camNum);
-		camera->setPosition(temp.x, 10, temp.z);
-	}
-
+	//regenerates the dungeon / caves and re sets the buffers that will be sent to the shader
 	if (ImGui::Button("Regen dungeon"))
 	{
-		manager->setup(200, 200, 5);
-		bound->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
-		cube->init(renderer->getDevice(), manager->getCave(), manager->getCount());
+		manager->setup(width, depth, splits, chance);
+		bound->init(renderer->getDevice(), manager->getBounds(), manager->getCount());
+		cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
+		path->init(renderer->getDevice(), manager->getAllPath(), manager->getPathSize());
+	}
+	//create thread to make new generateion of cave
+	if (ImGui::Button("Life step"))
+	{
+		caveStep = new std::thread([&] {lifeStep(); });
+	}
+	if (ImGui::Button("pseudo Life step"))
+	{
+		caveStep = new std::thread([&] {pseudoLifeStep(); });
 	}
 
 

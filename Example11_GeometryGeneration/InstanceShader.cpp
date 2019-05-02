@@ -29,6 +29,16 @@ InstanceShader::~InstanceShader()
 		layout->Release();
 		layout = 0;
 	}
+	if (posBuffer)
+	{
+		posBuffer->Release();
+		posBuffer = 0;
+	}
+	if (timeBuffer)
+	{
+		timeBuffer->Release();
+		timeBuffer = 0;
+	}
 
 
 	BaseShader::~BaseShader();
@@ -37,6 +47,8 @@ InstanceShader::~InstanceShader()
 void InstanceShader::initShader(WCHAR* vertex, WCHAR* pixel)
 {
 	D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC cellPosBufferDesc;
+	D3D11_BUFFER_DESC timeBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 	load(vertex);
 	loadPixelShader(pixel);
@@ -51,6 +63,22 @@ void InstanceShader::initShader(WCHAR* vertex, WCHAR* pixel)
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	renderer->CreateBuffer(&matrixBufferDesc, NULL, &matrixBuffer);
+
+	cellPosBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cellPosBufferDesc.ByteWidth = sizeof(cellPosBufferType);
+	cellPosBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cellPosBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cellPosBufferDesc.MiscFlags = 0;
+	cellPosBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&cellPosBufferDesc, NULL, &posBuffer);
+
+	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeBufferDesc.ByteWidth = sizeof(timeBufferType);
+	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeBufferDesc.MiscFlags = 0;
+	timeBufferDesc.StructureByteStride = 0;
+	renderer->CreateBuffer(&timeBufferDesc, NULL, &timeBuffer);
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -68,7 +96,7 @@ void InstanceShader::initShader(WCHAR* vertex, WCHAR* pixel)
 
 }
 
-void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, int indexCount, int instanceCount, ID3D11ShaderResourceView* texture)
+void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX &world, const XMMATRIX &view, const XMMATRIX &projection, int indexCount, int instanceCount, ID3D11ShaderResourceView* texture, XMFLOAT2 positions[], float time)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -87,11 +115,28 @@ void InstanceShader::setShderParameters(ID3D11DeviceContext* deviceContext, cons
 	deviceContext->Unmap(matrixBuffer, 0);
 	deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
 
+	//send position data to shader
+	cellPosBufferType* posDataPtr;
+	deviceContext->Map(posBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	posDataPtr = (cellPosBufferType*)mappedResource.pData;
+	for (int i = 0; i < 16; i++)
+	{
+		posDataPtr->pos[i] = positions[i];
+	}
+	deviceContext->Unmap(posBuffer, 0);
+	deviceContext->PSSetConstantBuffers(0, 1, &posBuffer);
+
+	//time no onger used but still gets sent over to buffer
+	timeBufferType* timePtr;
+	deviceContext->Map(timeBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	timePtr = (timeBufferType*)mappedResource.pData;
+	timePtr->time = time;
+	timePtr->padding = XMFLOAT3(0, 0, 0);
+	deviceContext->Unmap(timeBuffer, 0);
+	deviceContext->PSSetConstantBuffers(1, 1, &timeBuffer);
+
 	deviceContext->PSSetShaderResources(0, 1, &texture);
 	deviceContext->PSSetSamplers(0, 1, &sampleState);
-
-	//deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
-
 
 }
 
@@ -104,17 +149,15 @@ void InstanceShader::render(ID3D11DeviceContext* deviceContext, int indexCount, 
 	deviceContext->VSSetShader(vertexShader, NULL, 0);
 	deviceContext->PSSetShader(pixelShader, NULL, 0);
 
-
-
-	// Render the triangle.
-	//deviceContext->DrawInstanced(indexCount, instanceCount, 0, 0);
+	//render the voxals
 	deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
 }
 
-
+//overloaded vertex input buffer - should have made a another base shader class that inhearates from base shader with this in it
 bool InstanceShader::load(WCHAR* name)
 {
 	ID3D10Blob* customeVertexShaderBuffer;
+	//set size of input
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[5];
 	ID3D10Blob* error;
 	HRESULT result;
@@ -128,7 +171,7 @@ bool InstanceShader::load(WCHAR* name)
 	{
 		return false;
 	}
-
+	//create a new vertex shader
 	result = renderer->CreateVertexShader(customeVertexShaderBuffer->GetBufferPointer(), customeVertexShaderBuffer->GetBufferSize(), NULL, &vertexShader);
 
 	if (FAILED(result))
@@ -136,7 +179,7 @@ bool InstanceShader::load(WCHAR* name)
 
 		return false;
 	}
-
+	//set up the type of data that we will send to the buffer
 	polygonLayout[0].SemanticName = "POSITION";
 	polygonLayout[0].SemanticIndex = 0;
 	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -178,7 +221,7 @@ bool InstanceShader::load(WCHAR* name)
 	polygonLayout[4].InstanceDataStepRate = 1;
 
 	numberElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
-
+	//create a new input and hand it the new vertex buffer
 	result = renderer->CreateInputLayout(polygonLayout, numberElements, customeVertexShaderBuffer->GetBufferPointer(), customeVertexShaderBuffer->GetBufferSize(), &layout);
 
 	if (FAILED(result))

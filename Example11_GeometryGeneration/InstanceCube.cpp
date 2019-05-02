@@ -16,10 +16,12 @@ void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count)
 	//initBuffers(device);
 	D3D11_SUBRESOURCE_DATA instanceData;
 
+	//amount of things that we will draw
 	instanceCount = count;
 	
 	InstanceType* instances = new InstanceType[instanceCount];
 
+	//loop ver the instance array and put the cell map data in it to draw everything
 	for (int i = 0; i < count; i++)
 	{
 		instances[i].position = cellMap[i].position;
@@ -34,43 +36,6 @@ void InstanceCube::init(ID3D11Device* device, cells* cellMap, int count)
 	delete[] instances;
 	instances = 0;
 }
-void InstanceCube::Init2D(ID3D11Device* device, cells* cellMap, int count, int width, int depth)
-{
-	D3D11_SUBRESOURCE_DATA instanceData;
-
-	instanceCount = count;
-
-	InstanceType* instances = new InstanceType[instanceCount];
-
-	int index = 0;
-	int pos = 0;
-	it = 0;
-
-	for (int z = 0; z < depth; z++)
-	{
-		for (int x = 0; x < width; x++)
-		{
-			index = (z*width) + x;
-			it++;
-			if (cellMap[index].active)
-			{
-				instances[pos].position = cellMap[index].position;
-				instances[pos].colour = cellMap[index].colour;
-				pos++;
-			}
-		}
-
-
-	}
-
-	D3D11_BUFFER_DESC instanceBufferDesc = { sizeof(InstanceType)* instanceCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
-	instanceData = { instances ,0,0 };
-	device->CreateBuffer(&instanceBufferDesc, &instanceData, &instanceBuffer);
-
-	delete[] instances;
-	instances = 0;
-}
-
 void InstanceCube::initBuffers(ID3D11Device* device)
 {
 	D3D11_SUBRESOURCE_DATA vertexData, indexData;
@@ -79,6 +44,8 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 
 	VertexType* vertices = new VertexType[vertexCount];
 	unsigned long* indices = new unsigned long[indexCount];
+
+	//set up cube verticies - could be cleaner put it does the job
 
 	//front face
 	vertices[0].position = XMFLOAT3(0.0f, 1.0f, 0.0f);
@@ -272,6 +239,8 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 	vertices[35].texture = XMFLOAT2(1.0f, 1.0f);
 	indices[35] = 30;
 
+
+	//set up buffers for the vertex data 
 	D3D11_BUFFER_DESC vertexBufferDesc = { sizeof(VertexType) * vertexCount, D3D11_USAGE_DEFAULT, D3D11_BIND_VERTEX_BUFFER, 0, 0, 0 };
 	vertexData = { vertices, 0 , 0 };
 	device->CreateBuffer(&vertexBufferDesc, &vertexData, &vertexBuffer);
@@ -289,6 +258,7 @@ void InstanceCube::initBuffers(ID3D11Device* device)
 
 void InstanceCube::sendData(ID3D11DeviceContext* deviceContext)
 {
+	//two buffers are sent vertex and instance
 	unsigned int stride[2];
 	unsigned int offset[2];
 	ID3D11Buffer* bufferPointers[2];

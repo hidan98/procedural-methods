@@ -4,14 +4,13 @@
 
 // Includes
 #include "DXF.h"	// include dxframework
-#include "GeometryShader.h"
 #include "InstanceCube.h"
 #include "InstanceShader.h"
 #include"Cave.h"
 #include <thread>
 #include "Dungeon.h"
 #include "DungeonManager.h"
-#include "LinkedList.h"
+
 
 class App1 : public BaseApplication
 {
@@ -27,34 +26,36 @@ protected:
 	bool render();
 	void gui();
 
-	void Cavestep();
+	void lifeStep();
+	void pseudoLifeStep();
 
 private:
-	GeometryShader* geometryShader;
+
 	PointMesh* mesh;
 
-	InstanceCube* cube;
+	//multiple cube set ups, one for each part 
+	InstanceCube* cave;
 	InstanceCube* bound;
+	InstanceCube* path;
 	InstanceShader* shader;
-	Cave* caveGen;
 
 	bool regen;
 	bool step;
 
 	int chance;
-	int death;
-	int alive;
-	int livelim;
+	int splits;
 
-	int width, height, depth;
+	int width, depth;
 
 	std::thread* caveStep;
 	bool close;
 	Dungeon* dungeon;
 	DungeonManager* manager;
 
-	int camNum;
-	std::vector<Dungeon>* vec;
+
+	XMFLOAT2 positions[16];
+	float timeCollect;
+	bool first;
 
 };
 
