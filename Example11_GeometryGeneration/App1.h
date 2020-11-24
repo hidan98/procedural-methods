@@ -10,7 +10,8 @@
 #include <thread>
 #include "Dungeon.h"
 #include "DungeonManager.h"
-
+#include <mutex>
+#include <atomic>
 
 class App1 : public BaseApplication
 {
@@ -57,6 +58,11 @@ private:
 	float timeCollect;
 	bool first;
 
+	std::mutex mutex_lock;
+	std::atomic_bool lock;
+	std::atomic_bool unlock;
 };
+
+
 
 #endif

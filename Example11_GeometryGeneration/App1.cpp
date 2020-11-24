@@ -4,9 +4,12 @@
 #include <stdlib.h>
 #include <time.h>
 
+
 App1::App1()
 {
 	srand(time(NULL));
+	lock = false;
+	unlock = false;
 }
 
 void App1::init(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight, Input *in, bool VSYNC, bool FULL_SCREEN)
@@ -79,28 +82,36 @@ App1::~App1()
 
 void App1::lifeStep()
 {
+	lock = true;
+	mutex_lock.lock();
 	//generates new level of cave using life rulls and resets buffer 
 	manager->lifeStep();
 	cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
-	close = true;
+	mutex_lock.unlock();
+	unlock = true;
 }
 void App1::pseudoLifeStep()
 {
+	lock = true;
+	mutex_lock.lock();
 	//generates new level of cave using pseudoLife rulls and resets buffer 
 	manager->pseudoLifestep();
 	cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
-	close = true;
+	mutex_lock.unlock();
+	unlock = true;
 }
 
+//update function
 bool App1::frame()
 {
 	bool result;
 	
 	//catches the thread and closes it
-	if (close)
+	if (unlock)
 	{
 		caveStep->join();
-		close = false;
+		lock = false;
+		unlock = false;
 	}
 
 	result = BaseApplication::frame(); 
@@ -181,10 +192,12 @@ void App1::gui()
 		cave->init(renderer->getDevice(), manager->getAllCave(), manager->getCaveSize());
 		path->init(renderer->getDevice(), manager->getAllPath(), manager->getPathSize());
 	}
+
 	//create thread to make new generateion of cave
 	if (ImGui::Button("Life step"))
 	{
-		caveStep = new std::thread([&] {lifeStep(); });
+		if(!lock)
+			caveStep = new std::thread([&] {lifeStep(); });
 	}
 	if (ImGui::Button("pseudo Life step"))
 	{
